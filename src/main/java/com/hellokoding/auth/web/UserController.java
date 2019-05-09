@@ -20,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class UserController {
@@ -88,23 +89,36 @@ public class UserController {
     }
 
     @PostMapping("/validation")
-    public String  validateSubmit(@ModelAttribute("cluster") Cluster cluster)   {
-    
+	public ModelAndView validateSubmit(@ModelAttribute("cluster") Cluster cluster) {
+		ModelAndView model = new ModelAndView();
+		String resultCreation = "";
 		try {
-		int resultCreation =filemanagerServiceImpl.runPlayBook(filemanagerServiceImpl.getGeneratedFilePath());
-		if(resultCreation==0) {
-		int resultCreationStandardCluster=	filemanagerServiceImpl.runPlayBook(filemanagerServiceImpl.getGeneratedStandardFilePath());
-		if(resultCreationStandardCluster!=0) {
-			return "failCreationStandardCluster";
-		}
-		}
+			resultCreation = filemanagerServiceImpl.runPlayBook(filemanagerServiceImpl.getGeneratedFilePath());
+			if (!resultCreation.contains("fatal")) {
+				String resultCreationStandardCluster = filemanagerServiceImpl
+						.runPlayBook(filemanagerServiceImpl.getGeneratedStandardFilePath());
+				resultCreation += "\n " + resultCreationStandardCluster;
+				if (resultCreationStandardCluster.contains("fatal")) {
+					filemanagerServiceImpl.removeCreatedResourceGroup();
+					model.setViewName("failCreationStandardCluster");
+					model.addObject("message", resultCreationStandardCluster);
+					return model;
+				}
+			} else {
+				filemanagerServiceImpl.removeCreatedResourceGroup();
+				model.setViewName("fail");
+				model.addObject("message", resultCreation);
+				return model;
+			}
 		} catch (IOException | InterruptedException e) {
-		return "fail";	
+			model.addObject("message", e.getMessage());
+			model.setViewName("fail");
+			return model;
 		}
-		
-		
-    	return "result";    	
-    }
+		model.addObject("message", resultCreation);
+		model.setViewName("result");
+		return model;
+	}
 
     
     @PostMapping("/createcluster")
@@ -120,7 +134,10 @@ public class UserController {
 			FileUtils.copyFile(new File(filemanagerServiceImpl.getTemplateStandardFilePath() ), copiedStandardFile);
 			filemanagerServiceImpl.standardAksCreator(cluster);
 
-			
+	    	File copiedRemovalRG = new File(filemanagerServiceImpl.getGeneratedRemoveGroupFilePath());
+			FileUtils.copyFile(new File(filemanagerServiceImpl.getTemplateRemoveResourceGroupFilePath()), copiedRemovalRG);
+			filemanagerServiceImpl.replaceResourceGroupRemovalFileContent(Paths.get(filemanagerServiceImpl.getGeneratedRemoveGroupFilePath()), cluster.getAksName(), cluster.getTag());
+
     	} catch (IOException e) {
 			LOGGER.error("a problem with your file ", e);
  		}

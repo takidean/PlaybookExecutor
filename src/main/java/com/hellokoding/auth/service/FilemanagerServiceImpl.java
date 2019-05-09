@@ -35,7 +35,7 @@ public class FilemanagerServiceImpl {
 	@Value("${generatedfile.path}")
 	String generatedFilePath;
 	
-	@Value("${template.path}")
+	@Value("${templatecluster.path}")
 	String templateFilePath;
 	
 	@Value("${credentials.path}")
@@ -47,6 +47,12 @@ public class FilemanagerServiceImpl {
 
 	@Value("${standardcluster.generatedfile.path}")
 	String generatedStandardFilePath;
+
+	@Value("${removeresourcegroup.template.path}")
+	String templateRemoveResourceGroupFilePath;
+
+	@Value("${removeresourcegroup.generatedfile.path}")
+	String generatedRemoveGroupFilePath;
 
 	
 	public String replaceFileContent(Path path, Cluster cluster) throws IOException {
@@ -65,6 +71,23 @@ public class FilemanagerServiceImpl {
 		Files.write(path, content.getBytes(charset));
 		return content;
 
+	}
+	
+	public String replaceResourceGroupRemovalFileContent(Path path, String aks_name, String tag) throws IOException {
+		Charset charset = StandardCharsets.UTF_8;
+		String content = new String(Files.readAllBytes(path), charset);
+		String ssh_key= new String(Files.readAllBytes(Paths.get(System.getProperty("user.home")+"/.ssh/id_rsa.pub")));  
+		content = content.replaceAll("ssh-rsa_value", ssh_key);
+		content = content.replaceAll("client_id_value", clientId);
+		content = content.replaceAll("client_secret_value", clientSecret);		
+		content = content.replaceAll("resource_group_value", "MC_delivery_westeurope_"+aks_name+"_"+tag);
+		Files.write(path, content.getBytes(charset));
+		return content;
+	}
+	
+	
+	public String removeCreatedResourceGroup() throws IOException, InterruptedException {
+	    return runPlayBook(generatedRemoveGroupFilePath);
 	}
 	
 	public String standardAksCreator(Cluster cluster) throws IOException {
@@ -107,8 +130,8 @@ public class FilemanagerServiceImpl {
 
 	}
 
-public int runPlayBook(String file) throws IOException, InterruptedException {
-		ProcessBuilder builder = new ProcessBuilder("ansible-playbook",file);
+public String runPlayBook(String file) throws IOException, InterruptedException {
+	ProcessBuilder builder = new ProcessBuilder("ansible-playbook",file);
 		Process process= builder.start();
 		StringBuilder output = new StringBuilder();
 		BufferedReader reader = new BufferedReader(
@@ -117,10 +140,8 @@ public int runPlayBook(String file) throws IOException, InterruptedException {
 		while ((line = reader.readLine()) != null) {
 			output.append(line + "\n");
 		}
-		int exitVal = process.waitFor();
-
-		return exitVal;
-
+		LOGGER.info(file);
+		return output.toString();
 	}
 	
 	
@@ -147,4 +168,21 @@ public int runPlayBook(String file) throws IOException, InterruptedException {
 		this.generatedStandardFilePath = generatedStandardFilePath;
 	}
 
+	public String getTemplateRemoveResourceGroupFilePath() {
+		return templateRemoveResourceGroupFilePath;
+	}
+
+	public void setTemplateRemoveResourceGroupFilePath(String templateRemoveResourceGroupFilePath) {
+		this.templateRemoveResourceGroupFilePath = templateRemoveResourceGroupFilePath;
+	}
+
+	public String getGeneratedRemoveGroupFilePath() {
+		return generatedRemoveGroupFilePath;
+	}
+
+	public void setGeneratedRemoveGroupFilePath(String generatedRemoveGroupFilePath) {
+		this.generatedRemoveGroupFilePath = generatedRemoveGroupFilePath;
+	}
+
+	
 }
