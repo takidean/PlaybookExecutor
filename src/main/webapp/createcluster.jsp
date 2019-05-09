@@ -25,9 +25,12 @@
   
     <div  id="divContainer" class="container">
         <form:form method="POST" action="${contextPath}/createcluster" modelAttribute="cluster" class="form-signin">
-            <spring:bind path="groupName">
+        
+
+         
+            <spring:bind path="subscriptionId">
                 <div class="form-group" style="margin-top:20px">
-                    <form:input type="text" path="groupName" class="form-control" placeholder="Resource Group Name"
+                    <form:input type="text" path="subscriptionId" class="form-control" placeholder="Subscription Id"
                                 autofocus="true"></form:input>
                 </div>
             </spring:bind>
@@ -46,19 +49,13 @@
                 </div>
             </spring:bind>
 
-            <spring:bind path="vmCount">
-                <div class="form-group ${status.error ? 'has-error' : ''}">
-                    <form:input type="text" path="vmCount" class="form-control" placeholder="vmCount"
-                                autofocus="true" ></form:input>
-                </div>
-            </spring:bind>
-
+ 
 			<spring:bind path="vmSize">
 				<div class="form-group">
 					<form:select path="vmSize" class="form-control">
 						<form:option value="Standard_D2s_v3">Standard_D2s_v3</form:option>
 						<form:option value="Standard_DS2_v2">Standard_DS2_v2</form:option>
-						<form:option selected="Standard_DS1_v2" value="htc">Standard_DS1_v2</form:option>
+						<form:option selected="Standard_DS1_v2" value="Standard_DS1_v2">Standard_DS1_v2</form:option>
 						<form:option value="Standard_B4ms">Standard_B4ms</form:option>
 						<form:option value="Standard_B4ms">Standard_B4ms</form:option>
 						<form:option value="Standard_B8ms">Standard_B8ms</form:option>
@@ -67,12 +64,22 @@
 				</div>
 			</spring:bind>
 
-            <spring:bind path="tag">
+          <!--   <spring:bind path="tag">
                 <div class="form-group ${status.error ? 'has-error' : ''}">
                     <form:input type="text" path="tag" class="form-control" placeholder="tag"
                                 autofocus="true"></form:input>
                 </div>
             </spring:bind>
+ -->
+			<spring:bind path="tag">
+				<div class="form-group">
+					<form:select path="tag" class="form-control">
+						<form:option value="UAT">UAT</form:option>
+						<form:option value="Production">Production</form:option>
+						<form:option selected="Dev" value="Dev">Dev</form:option>
+					</form:select>
+				</div>
+			</spring:bind>
 
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 

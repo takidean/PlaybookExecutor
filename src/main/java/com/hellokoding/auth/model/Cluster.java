@@ -2,20 +2,12 @@ package com.hellokoding.auth.model;
 
 public class Cluster {
 	
-	private String groupName;
 	private String aksName;
 	private String userName;
 	private String vmCount;
 	private String vmSize;
 	private String tag;
-	
-	
-	public String getGroupName() {
-		return groupName;
-	}
-	public void setGroupName(String groupName) {
-		this.groupName = groupName;
-	}
+	private String subscriptionId;
 	
 	//
 	
@@ -60,6 +52,12 @@ public class Cluster {
 	}
 	public void setTag(String tag) {
 		this.tag = tag;
+	}
+	public String getSubscriptionId() {
+		return subscriptionId;
+	}
+	public void setSubscriptionId(String subscriptionId) {
+		this.subscriptionId = subscriptionId;
 	}
 	
 	

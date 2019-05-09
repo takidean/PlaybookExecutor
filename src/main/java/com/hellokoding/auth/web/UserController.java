@@ -11,10 +11,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
-import javax.servlet.RequestDispatcher;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.coyote.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class UserController {
@@ -74,14 +71,38 @@ public class UserController {
         return "createcluster";
     }
     
-    @GetMapping("/result")
-    public String login() {
-        return "result";
+    @PostMapping({"/"})
+    public String revert(Model model) {
+    	model.addAttribute("cluster", new Cluster());
+        return "createcluster";
     }
 
-    @GetMapping("/validation")
-    public String  validateSubmit(@ModelAttribute("cluster") Cluster cluster) throws IOException, InterruptedException  {
-		filemanagerServiceImpl.runPlayBook();
+    @GetMapping("/result")
+    public String login() {
+		try {
+		filemanagerServiceImpl.runPlayBook(filemanagerServiceImpl.getGeneratedFilePath());
+		} catch (IOException | InterruptedException e) {
+		return "fail";	
+		}
+    	return "result";    	
+    }
+
+    @PostMapping("/validation")
+    public String  validateSubmit(@ModelAttribute("cluster") Cluster cluster)   {
+    
+		try {
+		int resultCreation =filemanagerServiceImpl.runPlayBook(filemanagerServiceImpl.getGeneratedFilePath());
+		if(resultCreation==0) {
+		int resultCreationStandardCluster=	filemanagerServiceImpl.runPlayBook(filemanagerServiceImpl.getGeneratedStandardFilePath());
+		if(resultCreationStandardCluster!=0) {
+			return "failCreationStandardCluster";
+		}
+		}
+		} catch (IOException | InterruptedException e) {
+		return "fail";	
+		}
+		
+		
     	return "result";    	
     }
 
@@ -89,15 +110,20 @@ public class UserController {
     @PostMapping("/createcluster")
     public String  startSubmit(@ModelAttribute("cluster") Cluster cluster)  {
     	try {
+    		filemanagerServiceImpl.replaceSubscriptionId(cluster.getSubscriptionId());
+    		
 	    	File copied = new File(filemanagerServiceImpl.getGeneratedFilePath());
 			FileUtils.copyFile(new File(filemanagerServiceImpl.getTemplateFilePath()), copied);
 			filemanagerServiceImpl.replaceFileContent(Paths.get(filemanagerServiceImpl.getGeneratedFilePath()), cluster);
-			filemanagerServiceImpl.runPlayBook();
- 		} catch (IOException e) {
+ 		
+	    	File copiedStandardFile = new File(filemanagerServiceImpl.getGeneratedStandardFilePath());
+			FileUtils.copyFile(new File(filemanagerServiceImpl.getTemplateStandardFilePath() ), copiedStandardFile);
+			filemanagerServiceImpl.standardAksCreator(cluster);
+
+			
+    	} catch (IOException e) {
 			LOGGER.error("a problem with your file ", e);
- 		} catch (InterruptedException e) {
- 			LOGGER.error("a problem with execution of script ", e);
-		}
+ 		}
         return "validation";
     }
 }
