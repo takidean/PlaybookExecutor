@@ -94,9 +94,11 @@ public class UserController {
 		String resultCreation = "";
 		try {
 			resultCreation = filemanagerServiceImpl.runPlayBook(filemanagerServiceImpl.getGeneratedFilePath());
+			System.out.println("******************** "+resultCreation);
 			if (!resultCreation.contains("fatal")) {
 				String resultCreationStandardCluster = filemanagerServiceImpl
 						.runPlayBook(filemanagerServiceImpl.getGeneratedStandardFilePath());
+				System.out.println("-------------------- + "+ resultCreationStandardCluster);
 				resultCreation += "\n " + resultCreationStandardCluster;
 				if (resultCreationStandardCluster.contains("fatal")) {
 					filemanagerServiceImpl.removeCreatedResourceGroup();
