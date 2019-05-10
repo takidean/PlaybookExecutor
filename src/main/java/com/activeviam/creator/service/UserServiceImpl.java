@@ -1,11 +1,12 @@
-package com.hellokoding.auth.service;
+package com.activeviam.creator.service;
 
-import com.hellokoding.auth.model.Developper;
-import com.hellokoding.auth.repository.RoleRepository;
-import com.hellokoding.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.activeviam.creator.model.Developper;
+import com.activeviam.creator.repository.RoleRepository;
+import com.activeviam.creator.repository.UserRepository;
 
 import java.util.HashSet;
 

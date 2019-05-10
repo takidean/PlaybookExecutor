@@ -1,4 +1,4 @@
-package com.hellokoding.auth.service;
+package com.activeviam.creator.service;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.hellokoding.auth.model.Cluster;
+import com.activeviam.creator.model.Cluster;
 
 
 @Service
@@ -35,7 +35,7 @@ public class FilemanagerServiceImpl {
 	@Value("${generatedfile.path}")
 	String generatedFilePath;
 	
-	@Value("${template.path}")
+	@Value("${templatecluster.path}")
 	String templateFilePath;
 	
 	@Value("${credentials.path}")
@@ -48,12 +48,18 @@ public class FilemanagerServiceImpl {
 	@Value("${standardcluster.generatedfile.path}")
 	String generatedStandardFilePath;
 
+	@Value("${removeresourcegroup.template.path}")
+	String templateRemoveResourceGroupFilePath;
+
+	@Value("${removeresourcegroup.generatedfile.path}")
+	String generatedRemoveGroupFilePath;
+
 	
 	public String replaceFileContent(Path path, Cluster cluster) throws IOException {
 				
 		Charset charset = StandardCharsets.UTF_8;
 		String content = new String(Files.readAllBytes(path), charset);
-		content = content.replaceAll("resource_group_value", "MC_delivery_westeurope_"+cluster.getAksName()+"_"+cluster.getTag());
+		content = content.replaceAll("resource_group_value", cluster.getAksName()+"_"+cluster.getTag());
 		content = content.replaceAll("aks_name_value", cluster.getAksName());
 		String ssh_key= new String(Files.readAllBytes(Paths.get(System.getProperty("user.home")+"/.ssh/id_rsa.pub")));  
 		content = content.replaceAll("ssh-rsa_value", ssh_key);
@@ -67,13 +73,30 @@ public class FilemanagerServiceImpl {
 
 	}
 	
+	public String replaceResourceGroupRemovalFileContent(Path path, String aks_name, String tag) throws IOException {
+		Charset charset = StandardCharsets.UTF_8;
+		String content = new String(Files.readAllBytes(path), charset);
+		String ssh_key= new String(Files.readAllBytes(Paths.get(System.getProperty("user.home")+"/.ssh/id_rsa.pub")));  
+		content = content.replaceAll("ssh-rsa_value", ssh_key);
+		content = content.replaceAll("client_id_value", clientId);
+		content = content.replaceAll("client_secret_value", clientSecret);		
+		content = content.replaceAll("resource_group_value", aks_name+"_"+tag);
+		Files.write(path, content.getBytes(charset));
+		return content;
+	}
+	
+	
+	public String removeCreatedResourceGroup() throws IOException, InterruptedException {
+	    return runPlayBook(generatedRemoveGroupFilePath);
+	}
+	
 	public String standardAksCreator(Cluster cluster) throws IOException {
 		
 		Charset charset = StandardCharsets.UTF_8;
 		Path path=Paths.get(generatedStandardFilePath);
 		String content = new String(Files.readAllBytes(path), charset);
-		content = content.replaceAll("resource_group_value", "MC_delivery_westeurope_"+cluster.getAksName()+"_"+cluster.getTag());
-		content = content.replaceAll("aks_name_value", "Standard_"+cluster.getAksName());
+		content = content.replaceAll("resource_group_value", cluster.getAksName()+"_"+cluster.getTag());
+		content = content.replaceAll("aks_name_value", "standard"+cluster.getAksName());
 		String ssh_key= new String(Files.readAllBytes(Paths.get(System.getProperty("user.home")+"/.ssh/id_rsa.pub")));  
 		content = content.replaceAll("ssh-rsa_value", ssh_key);
 		content = content.replaceAll("client_id_value", clientId);
@@ -107,8 +130,8 @@ public class FilemanagerServiceImpl {
 
 	}
 
-public int runPlayBook(String file) throws IOException, InterruptedException {
-		ProcessBuilder builder = new ProcessBuilder("ansible-playbook",file);
+public String runPlayBook(String file) throws IOException, InterruptedException {
+	ProcessBuilder builder = new ProcessBuilder("ansible-playbook",file);
 		Process process= builder.start();
 		StringBuilder output = new StringBuilder();
 		BufferedReader reader = new BufferedReader(
@@ -116,11 +139,11 @@ public int runPlayBook(String file) throws IOException, InterruptedException {
 		String line;
 		while ((line = reader.readLine()) != null) {
 			output.append(line + "\n");
+			System.out.println(line);
 		}
-		int exitVal = process.waitFor();
-
-		return exitVal;
-
+		
+		LOGGER.info(file);
+		return output.toString();
 	}
 	
 	
@@ -147,4 +170,21 @@ public int runPlayBook(String file) throws IOException, InterruptedException {
 		this.generatedStandardFilePath = generatedStandardFilePath;
 	}
 
+	public String getTemplateRemoveResourceGroupFilePath() {
+		return templateRemoveResourceGroupFilePath;
+	}
+
+	public void setTemplateRemoveResourceGroupFilePath(String templateRemoveResourceGroupFilePath) {
+		this.templateRemoveResourceGroupFilePath = templateRemoveResourceGroupFilePath;
+	}
+
+	public String getGeneratedRemoveGroupFilePath() {
+		return generatedRemoveGroupFilePath;
+	}
+
+	public void setGeneratedRemoveGroupFilePath(String generatedRemoveGroupFilePath) {
+		this.generatedRemoveGroupFilePath = generatedRemoveGroupFilePath;
+	}
+
+	
 }

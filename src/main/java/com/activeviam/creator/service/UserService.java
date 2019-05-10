@@ -1,6 +1,6 @@
-package com.hellokoding.auth.service;
+package com.activeviam.creator.service;
 
-import com.hellokoding.auth.model.Developper;
+import com.activeviam.creator.model.Developper;
 
 public interface UserService {
     void save(Developper developper);

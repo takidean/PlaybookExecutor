@@ -24,8 +24,8 @@
         client_secret: "{{ client_secret }}"
       agent_pool_profiles:
         - name: default
-          count: 2
-          vm_size: Standard_D2_v2
+          count: 1
+          vm_size: Standard_B8ms
       tags:
         Environment: env_value
 

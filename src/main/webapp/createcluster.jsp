@@ -41,14 +41,6 @@
                                 autofocus="true"></form:input>
                 </div>
             </spring:bind>
-
-            <spring:bind path="userName">
-                <div class="form-group ${status.error ? 'has-error' : ''}">
-                    <form:input type="text" path="userName" class="form-control" placeholder="userName"
-                                autofocus="true"></form:input>
-                </div>
-            </spring:bind>
-
  
 			<spring:bind path="vmSize">
 				<div class="form-group">
@@ -56,10 +48,10 @@
 						<form:option value="Standard_D2s_v3">Standard_D2s_v3</form:option>
 						<form:option value="Standard_DS2_v2">Standard_DS2_v2</form:option>
 						<form:option selected="Standard_DS1_v2" value="Standard_DS1_v2">Standard_DS1_v2</form:option>
-						<form:option value="Standard_B4ms">Standard_B4ms</form:option>
-						<form:option value="Standard_B4ms">Standard_B4ms</form:option>
-						<form:option value="Standard_B8ms">Standard_B8ms</form:option>
-						<form:option value="Standard_B2ms">Standard_B2ms</form:option>
+						<form:option value="Standard_D16s_v3">16vCPU-64GiB D16s_v3</form:option>
+						<form:option value="Standard_B8ms">8vCPU-32GiB B8ms</form:option>
+						<form:option value="Standard_B4ms">4vCPU-16GiB B4ms</form:option>
+						<form:option value="Standard_B2ms">2vCPU-8GiB B2ms</form:option>
 					</form:select>
 				</div>
 			</spring:bind>

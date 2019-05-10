@@ -1,12 +1,13 @@
-package com.hellokoding.auth.validator;
+package com.activeviam.creator.validator;
 
-import com.hellokoding.auth.model.Developper;
-import com.hellokoding.auth.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
+
+import com.activeviam.creator.model.Developper;
+import com.activeviam.creator.service.UserService;
 
 @Component
 public class UserValidator implements Validator {
