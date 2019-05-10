@@ -1,9 +1,8 @@
-package com.hellokoding.auth.model;
+package com.activeviam.creator.model;
 
 public class Cluster {
 	
 	private String aksName;
-	private String userName;
 	private String vmCount;
 	private String vmSize;
 	private String tag;
@@ -19,14 +18,7 @@ public class Cluster {
 	}
 	
 	//
-	
-	public String getUserName() {
-		return userName;
-	}
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-	
+		
 	//
 	
 	public String getVmCount() {

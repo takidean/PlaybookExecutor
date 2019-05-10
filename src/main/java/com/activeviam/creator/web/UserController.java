@@ -1,11 +1,4 @@
-package com.hellokoding.auth.web;
-
-import com.hellokoding.auth.model.Cluster;
-import com.hellokoding.auth.model.Developper;
-import com.hellokoding.auth.service.FilemanagerServiceImpl;
-import com.hellokoding.auth.service.SecurityService;
-import com.hellokoding.auth.service.UserService;
-import com.hellokoding.auth.validator.UserValidator;
+package com.activeviam.creator.web;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +14,13 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.activeviam.creator.model.Cluster;
+import com.activeviam.creator.model.Developper;
+import com.activeviam.creator.service.FilemanagerServiceImpl;
+import com.activeviam.creator.service.SecurityService;
+import com.activeviam.creator.service.UserService;
+import com.activeviam.creator.validator.UserValidator;
 
 @Controller
 public class UserController {
@@ -94,14 +94,13 @@ public class UserController {
 		String resultCreation = "";
 		try {
 			resultCreation = filemanagerServiceImpl.runPlayBook(filemanagerServiceImpl.getGeneratedFilePath());
-			System.out.println("******************** "+resultCreation);
 			if (!resultCreation.contains("fatal")) {
 				String resultCreationStandardCluster = filemanagerServiceImpl
 						.runPlayBook(filemanagerServiceImpl.getGeneratedStandardFilePath());
-				System.out.println("-------------------- + "+ resultCreationStandardCluster);
 				resultCreation += "\n " + resultCreationStandardCluster;
 				if (resultCreationStandardCluster.contains("fatal")) {
-					filemanagerServiceImpl.removeCreatedResourceGroup();
+					String result =filemanagerServiceImpl.removeCreatedResourceGroup();
+					System.out.println(result);
 					model.setViewName("failCreationStandardCluster");
 					model.addObject("message", resultCreationStandardCluster);
 					return model;

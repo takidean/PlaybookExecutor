@@ -1,4 +1,4 @@
-package com.hellokoding.auth.model;
+package com.activeviam.creator.model;
 
 import javax.persistence.*;
 import java.util.Set;

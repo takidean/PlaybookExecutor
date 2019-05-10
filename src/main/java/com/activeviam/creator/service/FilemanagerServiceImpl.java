@@ -1,4 +1,4 @@
-package com.hellokoding.auth.service;
+package com.activeviam.creator.service;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.hellokoding.auth.model.Cluster;
+import com.activeviam.creator.model.Cluster;
 
 
 @Service
@@ -59,7 +59,7 @@ public class FilemanagerServiceImpl {
 				
 		Charset charset = StandardCharsets.UTF_8;
 		String content = new String(Files.readAllBytes(path), charset);
-		content = content.replaceAll("resource_group_value", "MC_delivery_westeurope_"+cluster.getAksName()+"_"+cluster.getTag());
+		content = content.replaceAll("resource_group_value", cluster.getAksName()+"_"+cluster.getTag());
 		content = content.replaceAll("aks_name_value", cluster.getAksName());
 		String ssh_key= new String(Files.readAllBytes(Paths.get(System.getProperty("user.home")+"/.ssh/id_rsa.pub")));  
 		content = content.replaceAll("ssh-rsa_value", ssh_key);
@@ -80,7 +80,7 @@ public class FilemanagerServiceImpl {
 		content = content.replaceAll("ssh-rsa_value", ssh_key);
 		content = content.replaceAll("client_id_value", clientId);
 		content = content.replaceAll("client_secret_value", clientSecret);		
-		content = content.replaceAll("resource_group_value", "MC_delivery_westeurope_"+aks_name+"_"+tag);
+		content = content.replaceAll("resource_group_value", aks_name+"_"+tag);
 		Files.write(path, content.getBytes(charset));
 		return content;
 	}
@@ -95,8 +95,8 @@ public class FilemanagerServiceImpl {
 		Charset charset = StandardCharsets.UTF_8;
 		Path path=Paths.get(generatedStandardFilePath);
 		String content = new String(Files.readAllBytes(path), charset);
-		content = content.replaceAll("resource_group_value", "MC_delivery_westeurope_"+cluster.getAksName()+"_"+cluster.getTag());
-		content = content.replaceAll("aks_name_value", "Standard_"+cluster.getAksName());
+		content = content.replaceAll("resource_group_value", cluster.getAksName()+"_"+cluster.getTag());
+		content = content.replaceAll("aks_name_value", "standard"+cluster.getAksName());
 		String ssh_key= new String(Files.readAllBytes(Paths.get(System.getProperty("user.home")+"/.ssh/id_rsa.pub")));  
 		content = content.replaceAll("ssh-rsa_value", ssh_key);
 		content = content.replaceAll("client_id_value", clientId);
@@ -139,7 +139,9 @@ public String runPlayBook(String file) throws IOException, InterruptedException 
 		String line;
 		while ((line = reader.readLine()) != null) {
 			output.append(line + "\n");
+			System.out.println(line);
 		}
+		
 		LOGGER.info(file);
 		return output.toString();
 	}

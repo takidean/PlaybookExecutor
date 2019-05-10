@@ -1,7 +1,8 @@
-package com.hellokoding.auth.repository;
+package com.activeviam.creator.repository;
 
-import com.hellokoding.auth.model.Developper;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.activeviam.creator.model.Developper;
 
 public interface UserRepository extends JpaRepository<Developper, Long> {
     Developper findByUsername(String username);
