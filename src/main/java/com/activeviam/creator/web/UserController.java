@@ -3,7 +3,8 @@ package com.activeviam.creator.web;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -11,21 +12,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.HtmlUtils;
 
 import com.activeviam.creator.model.Cluster;
 import com.activeviam.creator.model.Developper;
 import com.activeviam.creator.model.Greeting;
+import com.activeviam.creator.model.Task;
 import com.activeviam.creator.service.SecurityService;
+import com.activeviam.creator.service.TaskService;
 import com.activeviam.creator.service.UserService;
 import com.activeviam.creator.service.impl.FilemanagerServiceImpl;
 import com.activeviam.creator.validator.UserValidator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
 public class UserController {
@@ -38,6 +40,9 @@ public class UserController {
     @Autowired
     private SecurityService securityService;
 
+    @Autowired
+    private TaskService taskService;
+    
     @Autowired
     private UserValidator userValidator;
 
@@ -56,7 +61,6 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             return "registration";
         }
-
         userService.save(userForm);
         securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
         return "redirect:/createcluster";
@@ -111,19 +115,59 @@ public class UserController {
 //	}
 
     
-    @PostMapping("/validation")
-	public void validateSubmit(@ModelAttribute("cluster") Cluster cluster) {
- 		try {
-			filemanagerServiceImpl.runPlayBook(filemanagerServiceImpl.getGeneratedFilePath());
-		} catch (IOException | InterruptedException e) {
- LOGGER.debug("cannot run playBook", e);;
+    
+  @GetMapping("/taskslist")
+	public String tasksList(Model model) {
+	  Task t = new Task(1,"Tas",1,"creating");
+	  Task t2 = new Task(2,"Tas",2,"updat");
+//	  model.addAttribute("tasks", taskService.findTaskStatusByLocalDate());
+	  ArrayList<Task> tsls=new ArrayList<Task>();
+	  tsls.add(t);
+	  tsls.add(t2);
+	  
+		ObjectMapper mapper = new ObjectMapper();
+		String json = "";
+		try {
+			json = mapper.writeValueAsString(tsls);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
- 	}
+		
+	  model.addAttribute("list", json);
+
+	  model.addAttribute("tasks",tsls );
+
+	  return "taskslist";
+  }
+
+  @GetMapping("/taskslistrefresh")
+  @ResponseBody
+	public List<Task> taskslistrefresh(Model model) {
+	  Task t = new Task(1,"Tas",1,"creating");
+	  Task t2 = new Task(2,"Tas",2,"updat");
+	  ArrayList<Task> tsls=new ArrayList<Task>();
+	  tsls.add(t);
+	  tsls.add(t2);
+	  return tsls;
+  }
+    
+    @PostMapping("/validation")
+	public void validateSubmit(@ModelAttribute("cluster") Cluster cluster) throws Exception {
+		try {
+			filemanagerServiceImpl.asyncPlayBookCreateRG();
+		} catch (IOException | InterruptedException e) {
+			LOGGER.error("cannot run playBook", e);
+			throw new Exception("cannot run",e);
+		}
+	}
     
     @MessageMapping("/hello")
     @SendTo("/topic/tasks")
     public Greeting reportCurrentTime() throws InterruptedException {
-        return new Greeting("Tasks " + HtmlUtils.htmlEscape(""+2+""));
+    	
+    	int numberOfTasks =taskService.findTaskStatusByLocalDate().size();
+  
+        return new Greeting("Tasks " + HtmlUtils.htmlEscape(""+numberOfTasks+""));
     }
 
 //    @Scheduled(fixedRate = 10000)
@@ -140,7 +184,6 @@ public class UserController {
 	    	File copied = new File(filemanagerServiceImpl.getGeneratedFilePath());
 			FileUtils.copyFile(new File(filemanagerServiceImpl.getTemplateFilePath()), copied);
 			filemanagerServiceImpl.replaceFileContent(Paths.get(filemanagerServiceImpl.getGeneratedFilePath()), cluster);
-			
 	    	File copiedCreationRG = new File(filemanagerServiceImpl.getGeneratedCreationGroupFilePath());
 			FileUtils.copyFile(new File(filemanagerServiceImpl.getTemplateCreationResourceGroupFilePath()), copiedCreationRG);
 			filemanagerServiceImpl.replaceResourceGroupCreationFileContent(Paths.get(filemanagerServiceImpl.getGeneratedCreationGroupFilePath()), cluster);

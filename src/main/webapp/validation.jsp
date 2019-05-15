@@ -35,9 +35,6 @@
                 <p  class="form-control" >aksName: ${cluster.aksName}</p>
                 </div>
 
-                <div class="form-group ${status.error ? 'has-error' : ''}">
-                <p  class="form-control" >User name: ${cluster.userName}</p>
-                </div>
 
 
                 <div class="form-group ${status.error ? 'has-error' : ''}">
