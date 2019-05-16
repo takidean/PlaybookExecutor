@@ -14,6 +14,7 @@ import com.activeviam.creator.model.Task;
 public interface TaskRepository extends JpaRepository<Task, Long>{
 
 	public List<Task> findTaskStatusByLocalDate(LocalDate localDate);
-	
+	public List<Task> findTaskStatusByLocalDateAndStatus(LocalDate localDate,int status);
+
 	Task findById(int id);
 }

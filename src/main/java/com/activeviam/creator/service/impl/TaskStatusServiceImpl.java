@@ -32,6 +32,15 @@ public class TaskStatusServiceImpl implements TaskStatusService{
 	}
 
 	@Override
+	public List<TaskStatus> findTaskStatusByLocalDateAndStatus(int status) {
+		  LocalDate date = LocalDate.now();
+		  DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		  String text = date.format(formatter);
+		  LocalDate localDate = LocalDate.parse(text, formatter);
+		return taskStatusRepo.findTaskStatusByLocalDateAndStatus(localDate,status);
+	}
+	
+	@Override
 	public TaskStatus findById(int id) {
 
 		return taskStatusRepo.findById(id);

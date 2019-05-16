@@ -16,23 +16,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-        
-      
-  </head>
+ 
+ <style>
+.tab {border-collapse:collapse;}
+.tab .first {border-bottom:1px solid #EEE;}
+.tab .second {border-top:1px solid #CCC;box-shadow: inset 0 1px 0 #CCC;}
+</style>
+
+</head>
 <body>
 
 <h3 class="form-heading" style="margin-top: 0%;margin-left: 47%">Tasks </h3>
 <div  id="divContainer" class="container">
   
    
-<table id="tableToReload" border="1">
+<table id="tableToReload" class="tab">
         <tr>
           <th>Tasks</th>
         </tr>
         <c:forEach  items="${tasks}" var ="task">
         <tr>
-          <td>${task.type} by ${task.developper}</td>
-<!--     <td><img id="${task.id}_blue" src="${pageContext.request.contextPath}/resources/images/blue.png" style="visibility: hidden;"> <img style="visibility: hidden;" id="${task.id}_yellow" src="${pageContext.request.contextPath}/resources/images/yellow.png"> <img style="visibility: hidden;" id="${task.id}_load" src="${pageContext.request.contextPath}/resources/images/loader.gif"></td> -->
+          <td><a href="<c:url value="/logs/${task.id}" />"> ${task.type} by ${task.developper}  : </a>  </td>
     <td><img id="${task.id}" > </td>
 
         </tr>
@@ -93,6 +97,7 @@ $('#'+value.id).attr('src', "${pageContext.request.contextPath}/resources/images
 		     //   if(result.status == "Done"){
 
 		  		$.each(result, function( index, value ) {
+		  			console.log("task status "+value.status==0)
 					if(value.status==0){
 						$('#'+value.id).attr('src', "${pageContext.request.contextPath}/resources/images/yellow.png");
 					}
@@ -118,7 +123,7 @@ $('#'+value.id).attr('src', "${pageContext.request.contextPath}/resources/images
 	
 
 
-	    setInterval(ajaxGet, 10000);
+	    setInterval(ajaxGet, 60000);
 </script>
   <!-- 
          <script type="text/javascript">

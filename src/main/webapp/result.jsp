@@ -10,9 +10,9 @@
 </head>
 <body>
 	<h2
-		style="position: absolute; top: 35%; left: 50%; padding: 25px; -ms-transform: translateX(-50%) translateY(-50%); -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%)">Cluster Created With success</h2>
+		style="position: absolute; top: 35%; left: 50%; padding: 25px; -ms-transform: translateX(-50%) translateY(-50%); -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%)">Cluster creation logs</h2>
 
-	<p>${message}</p>
+	${logs}
 
 </body>
 </html>

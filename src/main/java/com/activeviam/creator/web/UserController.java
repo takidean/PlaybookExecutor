@@ -1,6 +1,9 @@
 package com.activeviam.creator.web;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -141,16 +144,34 @@ public class UserController {
   @GetMapping("/taskslistrefresh")
   @ResponseBody
 	public List<Task> taskslistrefresh(Model model) {
-	  Task t = new Task(1,"Tas",1,"creating");
-	  Task t2 = new Task(2,"Tas",2,"updat");
 	  ArrayList<Task> tsls=new ArrayList<Task>();
-	  tsls.add(t);
-	  tsls.add(t2);
+	  tsls.addAll(taskService.findTaskStatusByLocalDate());
+ 	  
 	  return tsls;
   }
-    
+  
+  @GetMapping("/logs/{id}")
+	public String taskslogs(@PathVariable(value="id") String id,Model model) {
+		
+		String resultLogs = "no logs found";
+try {
+			BufferedReader file = new BufferedReader(new FileReader(filemanagerServiceImpl.getLogsPath()+"/"+id+".txt"));
+			String line;
+			String input = "";
+			while ((line = file.readLine()) != null) {
+
+				input += "<h5>"+line + "</h5>"+ '\n';
+			}
+			resultLogs=input;
+			file.close();
+		} catch (Exception e) {
+			LOGGER.error("Cannot replace subscriptionID",e);
+		}  model.addAttribute("logs",resultLogs);
+	  return "result";
+  }
+  
     @PostMapping("/validation")
-	public void validateSubmit(@ModelAttribute("cluster") Cluster cluster) throws Exception {
+	public String validateSubmit(@ModelAttribute("cluster") Cluster cluster) throws Exception {
 		try {
 	        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			filemanagerServiceImpl.asyncPlayBookCreateRG(auth.getName());
@@ -158,13 +179,14 @@ public class UserController {
 			LOGGER.error("cannot run playBook", e);
 			throw new Exception("cannot run",e);
 		}
-	}
+	return "lunched";
+    }
     
     @MessageMapping("/hello")
     @SendTo("/topic/tasks")
     public Greeting reportCurrentTime() throws InterruptedException {
     	
-    	int numberOfTasks =taskService.findTaskStatusByLocalDate().size();
+    	int numberOfTasks =taskService.findTaskStatusByLocalDateAndStatus(2).size();
   
         return new Greeting("Tasks " + HtmlUtils.htmlEscape(""+numberOfTasks+""));
     }

@@ -11,5 +11,5 @@ public interface TaskStatusService {
    List<TaskStatus> findTaskStatusByLocalDate();
 
    TaskStatus findById(int id);
-    
+   List<TaskStatus> findTaskStatusByLocalDateAndStatus(int status);
 }

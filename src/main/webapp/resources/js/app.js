@@ -31,12 +31,12 @@ function sendName() {
 
 window.onload = function() {
 	connect();
-    setTimeout(sendName, 1000);
+    setTimeout(sendName, 500);
 
     setInterval(() => {
     	stompClient.send("/app/hello", {}, JSON.stringify({'name': "start"}));
 		
-	}, 90000);
+	}, 30000);
 
 	};
 	

@@ -2,9 +2,9 @@
   hosts: localhost
   connection: local
   vars:
-    resource_group: TAKITEST_Dev
+    resource_group: aaa_Dev
     location: westeurope
-    aks_name: standardTAKITEST
+    aks_name: standardaaa
     username: azureuser
     ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCy4jOx4cY6aL6VKPQbvaIkBExsJoWlWe5xObZRdxtPvEis1z7RDttAljBzEnne2LGNv9MRM21T+OOFjZrx+ySnwbAn6i1A8TCP6LT8wvF1E9wROLDqd7FKGlfECOG77r8dFXGWppLLZrKt6N0Wu+zYCcqWxMwWKVmHGeBp3zGkh7X/8k5lkzJAEesFDS8Sh9T80jJ5goby/jnsiLyjjlQn+UFf3KZnDJJ0RsK5m2UG2qJTGwiWffFEaOBNG3b9j0xQqGBsPyqGSx7td0tcsPtS4IOh6JCofe6FwD2bIQD98rhxybcmk8K3QTgJ7eZPN5HSCOCEFdSOp10+BYs8pRA9 jenkins@jenkins-ansible-Machine
 

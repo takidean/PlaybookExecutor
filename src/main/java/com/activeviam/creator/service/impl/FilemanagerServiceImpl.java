@@ -134,7 +134,7 @@ public class FilemanagerServiceImpl {
 		  DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		  String text = date.format(formatter);
 		  LocalDate localDate = LocalDate.parse(text, formatter);
-			int id = taskService.save(new Task(name, 1, AKS_CLUSTER_CREATION,localDate));
+			int id = taskService.save(new Task(name,2, AKS_CLUSTER_CREATION,localDate));
 
 			process = builder.start();
 		
@@ -149,13 +149,14 @@ public class FilemanagerServiceImpl {
 		}
 		Files.write(path, output.toString().getBytes(charset));
 
+		System.out.println("**** output.toString().contains(\"fatal\") "+output.toString().contains("fatal") );
 		if (!output.toString().contains("fatal")) {
 			String resultCreationAKS = asyncPlayBookCreateAKS(id, generatedFilePath, builder, path);
 			if (!resultCreationAKS.toString().contains("fatal")) {
 				String resultCreationAKSStandard = asyncPlayBookCreateAKS(id, generatedStandardFilePath, builder, path);
 				if (!resultCreationAKSStandard.toString().contains("fatal")) {
 					Task taskToUpdate= taskService.findById(id);
-					taskToUpdate.setStatus(2);
+					taskToUpdate.setStatus(1);
 					taskService.save(taskToUpdate);
 				} else {
 					Task taskToUpdate= taskService.findById(id);
@@ -278,5 +279,13 @@ public String runPlayBook(String file) throws IOException, InterruptedException 
 		this.generatedCreationGroupFilePath = generatedCreationGroupFilePath;
 	}
 
-	
+	public String getLogsPath() {
+		return logsPath;
+	}
+
+	public void setLogsPath(String logsPath) {
+		this.logsPath = logsPath;
+	}
+
+
 }
