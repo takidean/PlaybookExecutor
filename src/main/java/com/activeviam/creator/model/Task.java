@@ -21,11 +21,12 @@ public class Task {
 
 	
 	
-	public Task(String developper, int status, String type) {
+	public Task(String developper, int status, String type,LocalDate localDate) {
 		super();
 		this.developper = developper;
 		this.status = status;
 		this.type = type;
+		this.localDate=localDate;
 	}
 
 	public Task(int id,String developper, int status, String type) {

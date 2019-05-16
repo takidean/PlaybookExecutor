@@ -10,6 +10,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +32,7 @@ public class FilemanagerServiceImpl {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-	private String SUBSCRIPTION_ID="Subscription_Id";
+	private String SUBSCRIPTION_ID="subscription_id";
 	private String AKS_CLUSTER_CREATION="creation aks cluster";
 	
 	@Autowired
@@ -60,10 +63,10 @@ public class FilemanagerServiceImpl {
 	@Value("${standardcluster.generatedfile.path}")
 	String generatedStandardFilePath;
 	
-	@Value("${removeresourcegroup.template.path}")
+	@Value("${createresourcegroup.template.path}")
 	String templateCreationResourceGroupFilePath;
 
-	@Value("${removeresourcegroup.generatedfile.path}")
+	@Value("${createresourcegroup.generatedfile.path}")
 	String generatedCreationGroupFilePath;
 
 	@Value("${logs.path}")
@@ -123,14 +126,18 @@ public class FilemanagerServiceImpl {
 
 	
 	@Async("threadPoolTaskExecutor")
-	public void asyncPlayBookCreateRG() throws Exception  {
+	public void asyncPlayBookCreateRG(String name) throws Exception  {
 		try {
 		ProcessBuilder builder = new ProcessBuilder("ansible-playbook", generatedCreationGroupFilePath);
 		Process process;
-		
+		  LocalDate date = LocalDate.now();
+		  DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		  String text = date.format(formatter);
+		  LocalDate localDate = LocalDate.parse(text, formatter);
+			int id = taskService.save(new Task(name, 1, AKS_CLUSTER_CREATION,localDate));
+
 			process = builder.start();
 		
-		int id = taskService.save(new Task(securityService.findLoggedInUsername(), 1, AKS_CLUSTER_CREATION));
 		Path path = Paths.get(logsPath + "/" + id + ".txt");
 		Charset charset = StandardCharsets.UTF_8;
 		StringBuilder output = new StringBuilder();
@@ -145,7 +152,7 @@ public class FilemanagerServiceImpl {
 		if (!output.toString().contains("fatal")) {
 			String resultCreationAKS = asyncPlayBookCreateAKS(id, generatedFilePath, builder, path);
 			if (!resultCreationAKS.toString().contains("fatal")) {
-				String resultCreationAKSStandard = asyncPlayBookCreateAKS(id, generatedFilePath, builder, path);
+				String resultCreationAKSStandard = asyncPlayBookCreateAKS(id, generatedStandardFilePath, builder, path);
 				if (!resultCreationAKSStandard.toString().contains("fatal")) {
 					Task taskToUpdate= taskService.findById(id);
 					taskToUpdate.setStatus(2);
@@ -173,7 +180,7 @@ public class FilemanagerServiceImpl {
 		}
 	}
 
-	
+	@Async("threadPoolTaskExecutor")
 	public String asyncPlayBookCreateAKS(int idTask,String fileToExecute,ProcessBuilder builder,Path path) throws IOException, InterruptedException {
 	 builder = new ProcessBuilder("ansible-playbook",fileToExecute);
 	Process process= builder.start();		
@@ -186,11 +193,9 @@ public class FilemanagerServiceImpl {
 			output.append(line + "\n");
 			System.out.println(line);
 		}
-		Files.write(path, output.toString().getBytes(charset));	
+		Files.write(path, output.toString().getBytes(charset),StandardOpenOption.APPEND);
 		return output.toString();
 	}
-
-
 
 	
 	public void replaceSubscriptionId(String subscriptionId) {
@@ -201,7 +206,9 @@ public class FilemanagerServiceImpl {
 			String input = "";
 			while ((line = file.readLine()) != null) {
 				if (line.contains(SUBSCRIPTION_ID)) {
+				
 					line = SUBSCRIPTION_ID + "=" + subscriptionId;
+				System.out.println(line +" - - - - -- ");
 				}
 				input += line + '\n';
 			}

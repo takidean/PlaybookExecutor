@@ -27,6 +27,7 @@ public class TaskServiceImpl implements TaskService{
 		  LocalDate date = LocalDate.now();
 		  DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		  String text = date.format(formatter);
+		  System.out.println("local date =  "+text);
 		  LocalDate localDate = LocalDate.parse(text, formatter);
 		return taskStatusRepo.findTaskStatusByLocalDate(localDate);
 	}

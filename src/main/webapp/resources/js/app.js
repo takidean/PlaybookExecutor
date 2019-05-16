@@ -36,7 +36,7 @@ window.onload = function() {
     setInterval(() => {
     	stompClient.send("/app/hello", {}, JSON.stringify({'name': "start"}));
 		
-	}, 20000);
+	}, 90000);
 
 	};
 	

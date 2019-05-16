@@ -2,11 +2,12 @@
   hosts: localhost
   connection: local
   vars:
-    resource_group: a_Dev
+    resource_group: TAKITEST_Dev
     location: westeurope
-    aks_name: a
+    aks_name: TAKITEST
     username: azureuser
-    ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC/2pEbh3ZwbM2VNj4+UdYN9FqGLnuvAnpEmIf25LzC+50vrw4e59hT5+jjCBtxFhDk5AMveFjiY3kHCw7zA8Dq1W60THxNZd6mwgFWbKH1LE6lxS3+INMUQrkzd4s8rEfajdgqIltC3Zjq0khTTT6a8aYnPBYXXo7c2Tr3KVYUGgWF2kLeIFOT+dQZLeoyz80DCMZzMoiExMOpxPprA9DAz5maN9O3SvWME+NTlMb6+AceTZ4VnHz2/Ha2pCaXzh43IS3ZqaKI1kjyDHI9cLl+BZ/Ld3CVIunMZvrvD76O+1KMnJBcWyX26iI/plK9WC3Qy9aQNM5jBwvX+BNrSj+7 t.sdiri@quartetfs@LP023
+    ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCy4jOx4cY6aL6VKPQbvaIkBExsJoWlWe5xObZRdxtPvEis1z7RDttAljBzEnne2LGNv9MRM21T+OOFjZrx+ySnwbAn6i1A8TCP6LT8wvF1E9wROLDqd7FKGlfECOG77r8dFXGWppLLZrKt6N0Wu+zYCcqWxMwWKVmHGeBp3zGkh7X/8k5lkzJAEesFDS8Sh9T80jJ5goby/jnsiLyjjlQn+UFf3KZnDJJ0RsK5m2UG2qJTGwiWffFEaOBNG3b9j0xQqGBsPyqGSx7td0tcsPtS4IOh6JCofe6FwD2bIQD98rhxybcmk8K3QTgJ7eZPN5HSCOCEFdSOp10+BYs8pRA9 jenkins@jenkins-ansible-Machine
+
     client_id: a084bea2-4c58-486f-a9a1-631af5454943
     client_secret: 4/lpor8MU*pnxjJGkyt+LWM-VtC9w9Sr
   tasks:
