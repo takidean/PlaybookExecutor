@@ -1,6 +1,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<jsp:include page="header.jsp"/>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 
@@ -34,9 +35,6 @@
                 <p  class="form-control" >aksName: ${cluster.aksName}</p>
                 </div>
 
-                <div class="form-group ${status.error ? 'has-error' : ''}">
-                <p  class="form-control" >User name: ${cluster.userName}</p>
-                </div>
 
 
                 <div class="form-group ${status.error ? 'has-error' : ''}">
