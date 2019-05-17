@@ -1,7 +1,8 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<jsp:include page="header.jsp"/>
+<!-- <jsp:include page="header.jsp"/>-->
+<jsp:include page="navigation.jsp"/>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 
@@ -13,32 +14,31 @@
 
       <link href="${contextPath}/resources/css/bootstrap.min.css" rel="stylesheet">
       <link href="${contextPath}/resources/css/common.css" rel="stylesheet">
-        <link href="${contextPath}/resources/images/"></link>
+      <link href="${contextPath}/resources/images/"></link>
       
   </head>
 <body>
 
-	<h3 class="form-heading" style="margin-top: 0%;margin-left: 46%">Create your cluster</h3>
+	<h3 class="form-heading" style="height: 100%;width: 100%;display: flex;/*! position: fixed; */align-items: center;justify-content: center;">Cluster creation lunched</h3>
 
-  <div style="margin-top: 1%;margin-left: 41%;">
-  <img src="${pageContext.request.contextPath}/resources/images/activeviam-logo-tagline.svg">
+  <div style="width: 100%;display: flex;position: fixed;align-items: center;justify-content: center;">
+  <img src="/resources/images/activeviam-logo-tagline.svg">
+ 	
+  </div>
+
+<div style="width: 100%;display: flex;position: fixed;align-items: center;justify-content: center;">
+<img id="imgwait" src="/resources/images/done.gif" style="width: 100px;padding-top: 20%;"> 	
   </div>
   
-    <div  id="divContainer" class="container">
-        <div class="form-signin">
+  
         
-      	<h2 id="waitmessage"
-		style="display: none ; margin-top:20px ; position: absolute; left: 50%; padding: 25px; -ms-transform: translateX(-50%) translateY(-50%); -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%)">Cluster creation lunched</h2>
 
-	<img id="imgwait"
-		src="${pageContext.request.contextPath}/resources/images/done.gif"
-		style=" display: none;  position: absolute;  bottom: 0; left: 0; right: 0; margin: auto; width: 100px;" />
+
       
       
-        </div>
+     
 
 
-    </div>
 		 	
 
 

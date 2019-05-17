@@ -93,7 +93,7 @@ public class UserController {
     }
 
     @GetMapping("/result")
-    public String login() {
+    public String runCreation() {
 		try {
 		filemanagerServiceImpl.runPlayBook(filemanagerServiceImpl.getGeneratedFilePath());
 		} catch (IOException | InterruptedException e) {

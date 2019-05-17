@@ -145,11 +145,9 @@ public class FilemanagerServiceImpl {
 		String line = "";
 		while ((line = reader.readLine()) != null) {
 			output.append(line + "\n");
-			System.out.println(line);
 		}
 		Files.write(path, output.toString().getBytes(charset));
 
-		System.out.println("**** output.toString().contains(\"fatal\") "+output.toString().contains("fatal") );
 		if (!output.toString().contains("fatal")) {
 			String resultCreationAKS = asyncPlayBookCreateAKS(id, generatedFilePath, builder, path);
 			if (!resultCreationAKS.toString().contains("fatal")) {
@@ -192,7 +190,6 @@ public class FilemanagerServiceImpl {
 		String line="";
 		while ((line = reader.readLine()) != null) {
 			output.append(line + "\n");
-			System.out.println(line);
 		}
 		Files.write(path, output.toString().getBytes(charset),StandardOpenOption.APPEND);
 		return output.toString();
@@ -201,15 +198,12 @@ public class FilemanagerServiceImpl {
 	
 	public void replaceSubscriptionId(String subscriptionId) {
 		try {
-
 			BufferedReader file = new BufferedReader(new FileReader(credentialsFilePath));
 			String line;
 			String input = "";
 			while ((line = file.readLine()) != null) {
 				if (line.contains(SUBSCRIPTION_ID)) {
-				
 					line = SUBSCRIPTION_ID + "=" + subscriptionId;
-				System.out.println(line +" - - - - -- ");
 				}
 				input += line + '\n';
 			}
@@ -232,7 +226,6 @@ public String runPlayBook(String file) throws IOException, InterruptedException 
 		String line;
 		while ((line = reader.readLine()) != null) {
 			output.append(line + "\n");
-			System.out.println(line);
 		}
 		
 		LOGGER.error(file);

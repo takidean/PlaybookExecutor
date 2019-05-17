@@ -1,7 +1,8 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<jsp:include page="header.jsp"/>
+<!-- <jsp:include page="header.jsp"/>-->
+<jsp:include page="navigation.jsp"/>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 
@@ -18,9 +19,9 @@
   </head>
 <body>
 
-	<h3 class="form-heading" style="margin-top: 0%;margin-left: 46%">Create your cluster</h3>
+	<h3 class="form-heading" style="margin-top: 0%;">Create your cluster</h3>
 
-  <div style="margin-top: 1%;margin-left: 41%;">
+  <div style="margin-top: 1%">
   <img src="${pageContext.request.contextPath}/resources/images/activeviam-logo-tagline.svg">
   </div>
   
