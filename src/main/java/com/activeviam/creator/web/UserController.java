@@ -2,6 +2,7 @@ package com.activeviam.creator.web;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -146,9 +147,10 @@ public class UserController {
 			}
 			return "lunched";
 		} else {
-			return "AccessDenied";
-		}
-	}
+			return "AccessDenied";}
+  }
+  
+
     
     @MessageMapping("/hello")
     @SendTo("/topic/tasks")

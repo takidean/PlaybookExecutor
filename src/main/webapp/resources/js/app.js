@@ -23,7 +23,11 @@ function sendName() {
 window.onload = function() {
 	connect();
     setTimeout(sendName, 500);
+
     setInterval(() => {
     	stompClient.send("/app/hello", {}, JSON.stringify({'name': "start"}));
+		
 	}, 30000);
+
 	};
+	

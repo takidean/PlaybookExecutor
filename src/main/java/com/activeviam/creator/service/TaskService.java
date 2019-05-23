@@ -3,6 +3,7 @@ package com.activeviam.creator.service;
 import java.util.List;
 
 import com.activeviam.creator.model.Task;
+import com.activeviam.creator.model.TaskStatus;
 
 public interface TaskService {
 

@@ -19,7 +19,6 @@
   </head>
 <body>
 
-
   
     <div  id="divContainer" class="container">
         <form:form method="POST" action="${contextPath}/validation" modelAttribute="cluster" class="form-signin">
