@@ -7,7 +7,7 @@ function connect() {
     stompClient.connect({}, function (frame) {
         console.log('Connected: ' + frame);
         stompClient.subscribe('/topic/tasks', function (refresh) {
-            showGreeting(JSON.parse(refresh.body).content);
+        	showRefresh(JSON.parse(refresh.body).content);
         });
     });
 }
