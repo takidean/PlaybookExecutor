@@ -9,6 +9,7 @@ public interface TaskService {
    int  save(Task task);
 
    List<Task> findTaskStatusByLocalDate();
+   List<Task> findTaskStatusByLocalDateAndStatus(int status);
 
    Task findById(int id);
     

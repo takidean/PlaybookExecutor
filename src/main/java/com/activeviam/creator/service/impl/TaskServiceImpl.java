@@ -27,11 +27,18 @@ public class TaskServiceImpl implements TaskService{
 		  LocalDate date = LocalDate.now();
 		  DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		  String text = date.format(formatter);
-		  System.out.println("local date =  "+text);
 		  LocalDate localDate = LocalDate.parse(text, formatter);
 		return taskStatusRepo.findTaskStatusByLocalDate(localDate);
 	}
 
+	@Override
+	public List<Task> findTaskStatusByLocalDateAndStatus(int status) {
+		  LocalDate date = LocalDate.now();
+		  DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		  String text = date.format(formatter);
+		  LocalDate localDate = LocalDate.parse(text, formatter);
+		return taskStatusRepo.findTaskStatusByLocalDateAndStatus(localDate,status);
+	}
 	@Override
 	public Task findById(int id) {
 

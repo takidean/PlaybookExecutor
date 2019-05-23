@@ -3,6 +3,31 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+li {
+  float: left;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a:hover {
+  background-color: #111;
+}
+</style>
+<style>
 * {box-sizing: border-box;}
 
 body { 
@@ -22,9 +47,8 @@ body {
   text-align: center;
   padding-bottom: 12px;
   text-decoration: none;
-  font-size: 18px; 
-  line-height: 25px;
-  border-radius: 4px;
+  line-height: 21px;
+  border-radius: 44px;
 }
 
 .header a.logo {
@@ -58,24 +82,51 @@ body {
   }
 }
 </style>
-
-
 </head>
 
 <body>
-<div class="header">
-  <a href="#default" class="logo">CompanyLogo</a>
+
+
+<ul>
+  <li><a class="active" href="/">Home</a></li>
+  <li><a onClick="logout()"  href="/logout">logout</a></li>
+  <li><a href="/taskslist">task list</a></li>
+  <li style="
+    /* padding-right: 0px; */
+    style=&quot;float: right&quot;;
+    float: right;
+">  
+<div class="header" style="
+    padding-bottom: 0px;
+    padding-top: 0px;
+">
+  
   <div class="header-right">
-    <a id="tasksNum" class="active" href="/taskslist">Tasks</a>
+    <a id="tasksNum" class="active" href="/taskslist">Tasks 0</a>
   </div>
 </div>
+    </li>
+</ul>
 
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
   <script src="${contextPath}/resources/js/app.js"></script>
       
     <script src="/webjars/sockjs-client/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/stomp.min.js"></script>
-    
+      
+ <script>
+          var logout = function() {
+            $.post("/logout", function() {
+              $("#user").html('');
+              $(".unauthenticated").show();
+              $(".authenticated").hide();
+            })
+            return true;
+          }
+        </script>    
 
 </body>
+
+
+
 </html>

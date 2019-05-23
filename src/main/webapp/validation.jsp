@@ -1,7 +1,8 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<jsp:include page="header.jsp"/>
+<!-- <jsp:include page="header.jsp"/>-->
+<jsp:include page="navigation.jsp"/>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 
@@ -18,15 +19,16 @@
   </head>
 <body>
 
-	<h3 class="form-heading" style="margin-top: 0%;margin-left: 46%">Create your cluster</h3>
 
-  <div style="margin-top: 1%;margin-left: 41%;">
-  <img src="${pageContext.request.contextPath}/resources/images/activeviam-logo-tagline.svg">
-  </div>
   
     <div  id="divContainer" class="container">
         <form:form method="POST" action="${contextPath}/validation" modelAttribute="cluster" class="form-signin">
-        
+         	<h3 class="form-heading" style="margin-top: 0%">Create your cluster</h3>
+
+  <div style="margin-top: 1% ;align-items: center;justify-content: center;height: 129px;">
+<img src="/resources/images/activeviam-logo-tagline.svg" style="margin-top: 1% ;align-items: center;justify-content: center;height: 129px;"> 
+  </div>
+           
                 <div class="form-group" style="margin-top:20px">
                     <p  class="form-control" >subscriptionId: ${cluster.subscriptionId}</p>
                 </div>
@@ -51,11 +53,10 @@
             <button name="button_2" class="btn btn-lg btn-primary btn-block" style="margin-top:20px"  id="btnDisable" formaction="${contextPath}/" type="submit">Revert</button> 
       
       	<h2 id="waitmessage"
-		style="display: none ; margin-top:20px ; position: absolute; left: 50%; padding: 25px; -ms-transform: translateX(-50%) translateY(-50%); -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%)">Creating
-		cluster, please wait</h2>
+		style="display: none ; margin-top:20px ; position: absolute; left: 50%; padding: 25px; -ms-transform: translateX(-50%) translateY(-50%); -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%)">Cluster creation lunched</h2>
 
 	<img id="imgwait"
-		src="${pageContext.request.contextPath}/resources/images/transparent-google-loader-gif-4.gif"
+		src="${pageContext.request.contextPath}/resources/images/done.gif"
 		style=" display: none;  position: absolute;  bottom: 0; left: 0; right: 0; margin: auto; width: 100px;" />
       
       
@@ -80,21 +81,7 @@ $(document).ready(function() {
         $("#imgwait").show();
         $("#waitmessage").show();
 
-		$.ajax({
-			type: form.attr('method'),
-			url: form.attr('action'),
-			data: form.serialize(),
 
-			success: function(data) {
-                var msg = data.message;
-                if(msg === "fail") {
-                    alert("Failure to connect");
-                }
-                else {
-                    $.get('result.jsp');
-                }
-            }	
-			});
 	});
 });
 

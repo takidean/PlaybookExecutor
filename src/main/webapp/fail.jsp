@@ -1,4 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=utf-8"%>
+<!-- <jsp:include page="header.jsp"/>-->
+<jsp:include page="navigation.jsp"/>
+
 <!DOCTYPE html>
 <html lang="en-US">
 <head>

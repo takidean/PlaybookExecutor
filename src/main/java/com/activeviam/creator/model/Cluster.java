@@ -17,9 +17,6 @@ public class Cluster {
 		this.aksName = aksName;
 	}
 	
-	//
-		
-	//
 	
 	public String getVmCount() {
 		return vmCount;

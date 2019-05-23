@@ -1,13 +1,13 @@
 package com.activeviam.creator.model;
 
-public class Greeting {
+public class Refresh {
 
     private String content;
 
-    public Greeting() {
+    public Refresh() {
     }
 
-    public Greeting(String content) {
+    public Refresh(String content) {
         this.content = content;
     }
 

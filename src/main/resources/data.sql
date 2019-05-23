@@ -1,0 +1,1 @@
+insert into developper VALUES (1,'takidean','9382044');
