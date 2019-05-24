@@ -55,7 +55,14 @@ RUN \
 apk del --purge build
 
 RUN pip install --no-cache-dir --upgrade azure-cli
-
+RUN mkdir /opt/builder/
+RUN mkdir /root/.azure
+COPY credentials /root/.azure
+COPY template_resource_create.yaml /opt/builder/template_resource_create.yaml
+COPY template_standard_cluster.yaml /opt/builder/template_standard_cluster.yaml
+COPY template_cluster_tocreate.yaml /opt/builder/template_cluster_tocreate.yaml
+COPY clusterCreator.war /opt/builder/clusterCreator.war
+RUN chmod +wx /opt/builder/clusterCreator.war
 RUN apk update
 RUN apk fetch openjdk8
 RUN apk add openjdk8
@@ -65,4 +72,5 @@ RUN mkdir -p /ansible/playbooks
 WORKDIR /ansible/playbooks
 
 VOLUME [ "/ansible/playbooks" ]
+ENTRYPOINT ["java","-jar","/opt/builder/clusterCreator.war"]
 # default command: display Ansible version
