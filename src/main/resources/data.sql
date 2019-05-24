@@ -1,1 +1,10 @@
 insert into developper VALUES (1,'takidean','9382044');
+insert into developper VALUES (2,'fdelom','36132208');
+insert into developper VALUES (3,'mathieukh','16208282');
+insert into developper VALUES (4,'GuillaumeHalb','9949318');
+insert into developper VALUES (5,'hleunsa','39260561');
+insert into developper VALUES (7,'messaooudi','13294350');
+insert into developper VALUES (8,'astragier','27634982');
+insert into developper VALUES (9,'MrGrandeFrite','18212130');
+insert into developper VALUES (10,'SamTaz','39309622');
+insert into developper VALUES (11,'EMA-AV','29654968');

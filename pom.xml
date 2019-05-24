@@ -6,7 +6,7 @@
 	<artifactId>clusterCreator</artifactId>
 	<name>clusterCreator</name>
 	<description>clusterCreator</description>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
