@@ -32,6 +32,7 @@ import com.activeviam.creator.service.impl.FilemanagerServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
+@RequestMapping("/createcluster")
 public class UserController {
 	
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
@@ -48,7 +49,30 @@ public class UserController {
 	FilemanagerServiceImpl filemanagerServiceImpl;
 
 
-    @GetMapping({"/", "/createcluster"})
+
+    @GetMapping({"/home"})
+    public String home(Model model,Principal principal) {
+    	if(developerService.validateDeveloper(principal.getName())) {
+    	model.addAttribute("cluster", new Cluster());
+        return "createcluster";
+        }
+   	else {
+   		return "AccessDenied";
+   		}
+    }
+
+    @PostMapping({"/home"})
+    public String reverthome(Model model,Principal principal) {
+     	if(developerService.validateDeveloper(principal.getName())) {
+    	model.addAttribute("cluster", new Cluster());
+        return "createcluster";
+    	}
+      	else {
+       		return "AccessDenied";
+       	}
+    }
+    
+    @GetMapping({""})
     public String welcome(Model model,Principal principal) {
     	if(developerService.validateDeveloper(principal.getName())) {
     	model.addAttribute("cluster", new Cluster());
@@ -59,7 +83,7 @@ public class UserController {
    		}
     }
     
-    @PostMapping({"/"})
+    @PostMapping({"/revert"})
     public String revert(Model model,Principal principal) {
      	if(developerService.validateDeveloper(principal.getName())) {
     	model.addAttribute("cluster", new Cluster());

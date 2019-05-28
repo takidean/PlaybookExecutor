@@ -88,9 +88,9 @@ body {
 
 
 <ul>
-  <li><a class="active" href="/">Home</a></li>
+  <li><a class="active" href="/createcluster/home">Home</a></li>
   <li><a onClick="logout()"  href="/logout">logout</a></li>
-  <li><a href="/taskslist">task list</a></li>
+  <li><a href="/createcluster/taskslist">task list</a></li>
   <li style="
     /* padding-right: 0px; */
     style=&quot;float: right&quot;;
@@ -102,7 +102,7 @@ body {
 ">
   
   <div class="header-right">
-    <a id="tasksNum" class="active" href="/taskslist">Tasks 0</a>
+    <a id="tasksNum" class="active" href="/createcluster/taskslist">Tasks 0</a>
   </div>
 </div>
     </li>
@@ -116,7 +116,7 @@ body {
       
  <script>
           var logout = function() {
-            $.post("/logout", function() {
+            $.post("logout", function() {
               $("#user").html('');
               $(".unauthenticated").show();
               $(".authenticated").hide();

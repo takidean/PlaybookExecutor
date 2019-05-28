@@ -21,7 +21,7 @@
 
   
     <div  id="divContainer" class="container">
-        <form:form method="POST" action="${contextPath}/validation" modelAttribute="cluster" class="form-signin">
+        <form:form method="POST" action="${contextPath}/createcluster/validation" modelAttribute="cluster" class="form-signin">
          	<h3 class="form-heading" style="margin-top: 0%">Create your cluster</h3>
 
   <div style="margin-top: 1% ;align-items: center;justify-content: center;height: 129px;">
@@ -49,7 +49,7 @@
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
 			<button name="button_1" id="btnValidate"  class="btn btn-lg btn-primary btn-block" style="margin-top:20px" type="submit">Create</button>
-            <button name="button_2" class="btn btn-lg btn-primary btn-block" style="margin-top:20px"  id="btnDisable" formaction="${contextPath}/" type="submit">Revert</button> 
+            <button name="button_2" class="btn btn-lg btn-primary btn-block" style="margin-top:20px"  id="btnDisable" formaction="${contextPath}/createcluster/home" type="submit">Revert</button> 
       
       	<h2 id="waitmessage"
 		style="display: none ; margin-top:20px ; position: absolute; left: 50%; padding: 25px; -ms-transform: translateX(-50%) translateY(-50%); -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%)">Cluster creation lunched</h2>

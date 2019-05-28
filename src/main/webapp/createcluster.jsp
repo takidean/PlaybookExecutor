@@ -21,7 +21,7 @@
 
   
     <div  id="divContainer" class="container">
-        <form:form method="POST" action="${contextPath}/createcluster" modelAttribute="cluster" class="form-signin">
+        <form:form method="POST" action="${contextPath}/createcluster/createcluster" modelAttribute="cluster" class="form-signin">
  	<h3 class="form-heading" style="margin-top: 0%">Create your cluster</h3>
 
   <div style="margin-top: 1% ;align-items: center;justify-content: center;height: 129px;">

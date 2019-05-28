@@ -38,7 +38,7 @@
         </tr>
         <c:forEach  items="${tasks}" var ="task">
         <tr>
-          <td><a href="<c:url value="/logs/${task.id}" />"> ${task.type} by ${task.developper}  : </a>  </td>
+          <td><a href="<c:url value="/createcluster/logs/${task.id}" />"> ${task.type} by ${task.developper}  : </a>  </td>
     <td><img id="${task.id}" > </td>
 
         </tr>
@@ -77,7 +77,7 @@ $('#'+value.id).attr('src', "${pageContext.request.contextPath}/resources/images
 	  function ajaxGet(){
 		    $.ajax({
 		      type : "GET",
-		      url : "taskslistrefresh",
+		      url : "/createcluster/taskslistrefresh",
 		      success: function(result){
 		    	  console.log(result);
 		     //   if(result.status == "Done"){
