@@ -71,7 +71,7 @@ body {
 </div>
 
 <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
-  <script src="${contextPath}/resources/js/app.js"></script>
+  <script src="/resources/js/app.js"></script>
       
     <script src="/webjars/sockjs-client/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/stomp.min.js"></script>

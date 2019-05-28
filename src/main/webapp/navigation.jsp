@@ -108,7 +108,7 @@ body {
     </li>
 </ul>
 
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
   <script src="${contextPath}/resources/js/app.js"></script>
       
     <script src="/webjars/sockjs-client/sockjs.min.js"></script>

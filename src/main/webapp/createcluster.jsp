@@ -12,9 +12,9 @@
       <meta charset="utf-8">
       <title>Create your aks cluster</title>
 
-      <link href="${contextPath}/resources/css/bootstrap.min.css" rel="stylesheet">
-      <link href="${contextPath}/resources/css/common.css" rel="stylesheet">
-        <link href="${contextPath}/resources/images/"></link>
+      <link href="/resources/css/bootstrap.min.css" rel="stylesheet">
+      <link href="/resources/css/common.css" rel="stylesheet">
+        <link href="/resources/images/"></link>
       
   </head>
 <body>
@@ -83,7 +83,7 @@
 
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-  <script src="${contextPath}/resources/js/bootstrap.min.js"></script>
+  <script src="/resources/js/bootstrap.min.js"></script>
   
  <!-- 
         <script language="javascript">
