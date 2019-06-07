@@ -169,7 +169,7 @@ public class UserController {
 				LOGGER.error("cannot run playBook", e);
 				throw new Exception("cannot run", e);
 			}
-			return "lunched";
+			return "launched";
 		} else {
 			return "AccessDenied";}
   }

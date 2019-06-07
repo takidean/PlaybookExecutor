@@ -5,7 +5,6 @@ function connect() {
     var socket = new SockJS('/test');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
-        console.log('Connected: ' + frame);
         stompClient.subscribe('/topic/tasks', function (refresh) {
         	showRefresh(JSON.parse(refresh.body).content);
         });
