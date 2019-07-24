@@ -2,9 +2,10 @@ package com.activeviam.creator.web;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.HtmlUtils;
 
 import com.activeviam.creator.model.Cluster;
@@ -36,7 +38,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class UserController {
 	
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
-//	
+	
    @Autowired
     private DeveloperService developerService;
 
@@ -47,8 +49,6 @@ public class UserController {
 
 	@Autowired
 	FilemanagerServiceImpl filemanagerServiceImpl;
-
-
 
     @GetMapping({"/home"})
     public String home(Model model,Principal principal) {
@@ -97,7 +97,7 @@ public class UserController {
     @GetMapping("/result")
     public String runCreation() {
 		try {
-		filemanagerServiceImpl.runPlayBook(filemanagerServiceImpl.getGeneratedFilePath());
+		filemanagerServiceImpl.runPlayBook(filemanagerServiceImpl.getGeneratedAKSFilePath());
 		} catch (IOException | InterruptedException e) {
 		return "fail";	
 		}
@@ -164,7 +164,7 @@ public class UserController {
 		if (developerService.validateDeveloper(principal.getName())) {
 			try {
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-				filemanagerServiceImpl.asyncPlayBookCreateRG(auth.getName());
+				filemanagerServiceImpl.asyncPlayBookCreateRG(cluster,auth.getName());
 			} catch (IOException | InterruptedException e) {
 				LOGGER.error("cannot run playBook", e);
 				throw new Exception("cannot run", e);
@@ -190,21 +190,54 @@ public class UserController {
   
     
     @PostMapping("/createcluster")
-    public String  startSubmit(@ModelAttribute("cluster") Cluster cluster,Principal principal)  {
+    public String  startSubmit(@ModelAttribute("cluster") Cluster cluster,Principal principal,@RequestParam("ssl_certificate") MultipartFile ssl_certificate, @RequestParam("key") MultipartFile key )  {
      	if(developerService.validateDeveloper(principal.getName())) {
     	try {
     		filemanagerServiceImpl.replaceSubscriptionId(cluster.getSubscriptionId());
     		
-			fileGenerator(filemanagerServiceImpl.getGeneratedFilePath(), filemanagerServiceImpl.getTemplateFilePath());
-			filemanagerServiceImpl.replaceFileContent(Paths.get(filemanagerServiceImpl.getGeneratedFilePath()), cluster);
+			fileGenerator(filemanagerServiceImpl.getGeneratedAKSFilePath(), filemanagerServiceImpl.getTemplateAKSFilePath());
+			filemanagerServiceImpl.replaceFileContent(Paths.get(filemanagerServiceImpl.getGeneratedAKSFilePath()), cluster);
 	    	
 			fileGenerator(filemanagerServiceImpl.getGeneratedCreationGroupFilePath(), filemanagerServiceImpl.getTemplateCreationResourceGroupFilePath());
 			filemanagerServiceImpl.replaceResourceGroupCreationFileContent(Paths.get(filemanagerServiceImpl.getGeneratedCreationGroupFilePath()), cluster);
 
 			fileGenerator(filemanagerServiceImpl.getGeneratedStandardFilePath(), filemanagerServiceImpl.getTemplateStandardFilePath());
 			filemanagerServiceImpl.standardAksCreator(cluster);
+			
+			//ServerDB
+			fileGenerator(filemanagerServiceImpl.getGeneratedCreationdbserverFilePath(), filemanagerServiceImpl.getTemplateCreationdbserverFilePath());
+			filemanagerServiceImpl.replaceDbServerFileContent(Paths.get(filemanagerServiceImpl.getGeneratedCreationdbserverFilePath()), cluster);
 
+			// DB file path
+			fileGenerator(filemanagerServiceImpl.getGeneratedCreationdbFilePath(), filemanagerServiceImpl.getTemplateCreationdbFilePath());
+			filemanagerServiceImpl.replaceDbFileContent(Paths.get(filemanagerServiceImpl.getGeneratedCreationdbFilePath()), cluster);
+			// keycloak file 
+			fileGenerator(filemanagerServiceImpl.getGeneratedCreationkeycloakFilePath(), filemanagerServiceImpl.getTemplateCreationkeycloakFilePath());
+			filemanagerServiceImpl.replaceKeycloakDeploymentFileContent(cluster);
+			// keycloak secret
+			fileGenerator(filemanagerServiceImpl.getGeneratedCreationkeycloakSecretFilePath(), filemanagerServiceImpl.getTemplateCreationkeycloakSecretFilePath());
+			filemanagerServiceImpl.createSecretKeycloak(cluster);
+			// db secret
+			fileGenerator(filemanagerServiceImpl.getGeneratedCreationSecretDBFilePath(), filemanagerServiceImpl.getTemplateCreationSecretDBFilePath());
+			filemanagerServiceImpl.createSecretDB(cluster);
 
+			// INGRESS  
+			fileGenerator(filemanagerServiceImpl.getGeneratedCreationIngress(), filemanagerServiceImpl.getTemplateCreationIngress());
+			filemanagerServiceImpl.createIngress(cluster);
+
+			// keycloak  
+			fileGenerator(filemanagerServiceImpl.getGeneratedCreationKeycloak(), filemanagerServiceImpl.getTemplateCreationKeycloak());
+			filemanagerServiceImpl.createKeycloak(cluster);
+
+			// certif file 
+	            byte[] bytes = ssl_certificate.getBytes();
+	            Path path = Paths.get(filemanagerServiceImpl.getCertFilePath() + ssl_certificate.getOriginalFilename());
+	            Files.write(path, bytes);
+
+	             bytes = key.getBytes();
+	              path = Paths.get(filemanagerServiceImpl.getKeyFilePath() + key.getOriginalFilename());
+	            Files.write(path, bytes);
+	 
     	} catch (IOException e) {
 			LOGGER.error("a problem with your file ", e);
  		}

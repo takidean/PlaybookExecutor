@@ -1,0 +1,33 @@
+- name: Create Azure Kubernetes Service
+  hosts: localhost
+  connection: local
+  vars:
+    resource_group: TESTFINAL_Dev
+    location: westeurope
+    aks_name: TESTFINAL
+    username: azureuser
+    ssh_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCdSHLNmioauI3tVWLvg1Am7YdJ3hHr1eNiH6wNQFZCrV2723onf/OZzTbaNQddwsMv9ApnT27f7Ro7K6fKN9GQux/q/xBigQLEHQPNJO4oSiGfSbKW1RaG8bZk1TMgq1PaFOd60FtxoXUG6TD/BuYoXlUfB1P1jDwU8fmLxeP9nGFol4loHw+x5XaClKnSOatFW/k/iHa/r5gBl6FlnevDCisLenS25UCHuWlzTJEaJTotgx5nqIeXBrq6KKzdKChuT8hhnS4hatTaLEtjiRF+uZXuDahou7LXfTmdy3N9USw4FfpAgcwbhDNYRSiNQbZPgtF5oPxCisJKy6mO4o/k6T/FQB56mctneQm72Pj3tPSWr/JVGX40ZKUTM7TV6yK4bRlabyAuU2B9haxJQJuBYz3+E9YRKdOKCq+J27KKBwKB7CwU6TIunsC3O+EQw632UCGZ9XX7AQotjRqHgFTXvUJXyLDLCvS7uzLrUILiPdpdhX1X3teY2CmA5BaGiqzknCbW8qqD8K2VBrXc9Zgc/T8m/pniXbP58oksmhFeqE7Cxr19zxj3jflj4LXPFkywWnbXoJx/q+qlZKriShirEz84s+2Hw+vMd5qSGIgNsmTaM9U78m8IDTiMl0yAJdwoOA0xhMuxV3FA6QmMzK1zU7vvHPmzk6fIJn60DakQdQ== jenkins
+
+    client_id: a084bea2-4c58-486f-a9a1-631af5454943
+    client_secret: 4/lpor8MU*pnxjJGkyt+LWM-VtC9w9Sr
+  tasks:
+  - name: Create a managed Azure Container Services (AKS) cluster
+    azure_rm_aks:
+      name: "{{ aks_name }}"
+      location: "{{ location }}"
+      resource_group: "{{ resource_group }}"
+      dns_prefix: "{{ aks_name }}"
+      kubernetes_version: 1.12.7
+      enable_rbac: no
+      linux_profile:
+        admin_username: "{{ username }}"
+        ssh_key: "{{ ssh_key }}"
+      service_principal:
+        client_id: "{{ client_id }}"
+        client_secret: "{{ client_secret }}"
+      agent_pool_profiles:
+        - name: default
+          count: 1
+          vm_size: Standard_DS1_v2
+      tags:
+        Environment: Dev
