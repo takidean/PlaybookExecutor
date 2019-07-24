@@ -46,6 +46,7 @@
 					<form:select path="vmSize" class="form-control">
 						<form:option value="Standard_D2s_v3">Standard_D2s_v3</form:option>
 						<form:option value="Standard_DS2_v2">Standard_DS2_v2</form:option>
+						<form:option value="Standard_DS1_v2">Standard_DS1_v2</form:option>
 						<form:option selected="Standard_DS1_v2" value="Standard_DS1_v2">Standard_DS1_v2</form:option>
 						<form:option value="Standard_D16s_v3">16vCPU-64GiB D16s_v3</form:option>
 						<form:option value="Standard_B8ms">8vCPU-32GiB B8ms</form:option>

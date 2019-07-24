@@ -30,7 +30,7 @@ import com.activeviam.creator.service.common.Utils;
 
 
 @Service
-//@PropertySource("file:/opt/builder/external.properties")
+@PropertySource("file:/opt/builder/external.properties")
 public class FilemanagerServiceImpl {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
@@ -277,16 +277,16 @@ public class FilemanagerServiceImpl {
 		}
 		Files.write(path, output.toString().getBytes(charset));
 		if (!output.toString().contains("fatal")) {
-			String resultCreationAKS = asyncPlayBookCreateAKS(id, generatedAKSFilePath, builder, path);
+			String resultCreationAKS = asyncPlayBookCreateAKS(id, generatedAKSFilePath, path);
 			if (!resultCreationAKS.toString().contains("fatal")) {
-				String resultCreationAKSStandard = asyncPlayBookCreateAKS(id, generatedStandardFilePath, builder, path);
+				String resultCreationAKSStandard = asyncPlayBookCreateAKS(id, generatedStandardFilePath, path);
 				if (!resultCreationAKSStandard.toString().contains("fatal")) {
 					Task taskToUpdate= taskService.findById(id);
 					taskToUpdate.setStatus(1);
 					taskService.save(taskToUpdate);
-					String resultCreationDBStandard = asyncPlayBookCreateAKS(id, generatedCreationdbserverFilePath, builder, path);
+					String resultCreationDBStandard = asyncPlayBookCreateAKS(id, generatedCreationdbserverFilePath, path);
 					if(!resultCreationDBStandard.toString().contains("fatal")) {
-						String resultCreationDB = asyncPlayBookCreateAKS(id, generatedCreationdbFilePath, builder, path);
+						String resultCreationDB = asyncPlayBookCreateAKS(id, generatedCreationdbFilePath, path);
 					if(!resultCreationDB.contains("fatal")) {
 						taskToUpdate.setStatus(1);
 						taskService.save(taskToUpdate);
@@ -319,8 +319,8 @@ public class FilemanagerServiceImpl {
 	}
 
 	@Async("threadPoolTaskExecutor")
-	public String asyncPlayBookCreateAKS(int idTask,String fileToExecute,ProcessBuilder builder,Path path) throws IOException, InterruptedException {
-	 builder = new ProcessBuilder("ansible-playbook",fileToExecute);
+	public String asyncPlayBookCreateAKS(int idTask,String fileToExecute,Path path) throws IOException, InterruptedException {
+		ProcessBuilder builder = new ProcessBuilder("ansible-playbook",fileToExecute);
 	Process process= builder.start();		
 	Charset charset = StandardCharsets.UTF_8;
 	StringBuilder output = new StringBuilder();
