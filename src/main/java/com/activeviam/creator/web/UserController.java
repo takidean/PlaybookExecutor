@@ -160,11 +160,11 @@ public class UserController {
 	}
   
     @PostMapping("/validation")
-	public String validateSubmit(@ModelAttribute("cluster") Cluster cluster, Principal principal) throws Exception {
+	public String validateSubmit( Principal principal) throws Exception {
 		if (developerService.validateDeveloper(principal.getName())) {
 			try {
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-				filemanagerServiceImpl.asyncPlayBookCreateRG(cluster,auth.getName());
+				filemanagerServiceImpl.asyncPlayBookCreateRG(filemanagerServiceImpl.getCluster(),auth.getName());
 			} catch (IOException | InterruptedException e) {
 				LOGGER.error("cannot run playBook", e);
 				throw new Exception("cannot run", e);
@@ -238,6 +238,7 @@ public class UserController {
 	              path = Paths.get(filemanagerServiceImpl.getKeyFilePath() + key.getOriginalFilename());
 	            Files.write(path, bytes);
 	 
+	            filemanagerServiceImpl.setCluster(cluster);
     	} catch (IOException e) {
 			LOGGER.error("a problem with your file ", e);
  		}

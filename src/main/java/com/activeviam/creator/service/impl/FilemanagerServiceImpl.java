@@ -151,6 +151,8 @@ public class FilemanagerServiceImpl {
 	@Value("${keycloak.generatedfile.path}")
 	String generatedCreationKeycloak;
 
+	Cluster cluster;
+	
 	public String getTemplateCreationIngress() {
 		return templateCreationIngress;
 	}
@@ -222,6 +224,7 @@ public class FilemanagerServiceImpl {
 		Charset charset = StandardCharsets.UTF_8;
 		String content = new String(Files.readAllBytes(path), charset);
 		content = content.replaceAll(RESOURCE_GROUP_VALUE, cluster.getAksName()+"_"+cluster.getTag());
+		content = content.replaceAll(DB_SERVER_NAME, cluster.getDbServerName());	
 		content = content.replaceAll(DB_NAME, cluster.getDbServerName());		
 		Files.write(path, content.getBytes(charset));
 		return content;
@@ -285,7 +288,7 @@ public class FilemanagerServiceImpl {
 					taskToUpdate.setStatus(1);
 					taskService.save(taskToUpdate);
 					String resultCreationDBStandard = asyncPlayBookCreateAKS(id, generatedCreationdbserverFilePath, path);
-					if(!resultCreationDBStandard.toString().contains("fatal")) {
+					if(!resultCreationDBStandard.toString().contains("fatal") || !resultCreationDBStandard.toString().contains("ERROR")) {
 						String resultCreationDB = asyncPlayBookCreateAKS(id, generatedCreationdbFilePath, path);
 					if(!resultCreationDB.contains("fatal")) {
 						taskToUpdate.setStatus(1);
@@ -338,11 +341,15 @@ public class FilemanagerServiceImpl {
 	@Async("threadPoolTaskExecutor")
 	public void connectUser(Cluster cluster,int taskid) throws IOException {
 		
-	String login=	"az login --service-principal --username \""+clientId+ "\" --password \""+clientSecret+"\" --tenant \""+tenantId+"\"";		
-	ProcessBuilder builder = new ProcessBuilder(login);
+	String login=	"az login --service-principal --username "+clientId+ " --password "+clientSecret+" --tenant "+tenantId;		
+	System.out.println(login);
+	ProcessBuilder builder = new ProcessBuilder();
+	builder.command("bash", "-c",login);
 	Process process= builder.start();
+
 	Charset charset = StandardCharsets.UTF_8;
-	StringBuilder output = new StringBuilder();
+	StringBuilder output = new StringBuilder();	
+
 	BufferedReader reader = new BufferedReader(
 			new InputStreamReader(process.getInputStream()));	
 	String line="";
@@ -353,8 +360,11 @@ public class FilemanagerServiceImpl {
 	Files.write(path, output.toString().getBytes(charset),StandardOpenOption.APPEND);
 	
 	String mergeaks ="az aks get-credentials --resource-group " +cluster.getAksName()+"_"+cluster.getTag()+ " --name " +STANDARD+cluster.getAksName()+ " --subscription "+cluster.getSubscriptionId();
-	ProcessBuilder builderMerge = new ProcessBuilder(mergeaks);
+	System.out.println(mergeaks);
+	ProcessBuilder builderMerge = new ProcessBuilder();
+	builderMerge.command("bash", "-c",mergeaks);
 	Process processMerge= builderMerge.start();
+
 	BufferedReader readerMerge = new BufferedReader(
 			new InputStreamReader(processMerge.getInputStream()));	
 
@@ -369,7 +379,14 @@ public class FilemanagerServiceImpl {
 		 connectUser(cluster,taskid);
 		 Utils.createSecretDocker(cluster, taskid,logsPath);
 		 Utils.createNginx(generatedCreationIngress, taskid, logsPath);
+		 Utils.helmInstall(generatedCreationIngress, taskid, logsPath);
+		 Utils.applyNginxController(generatedCreationIngress, taskid, logsPath);
 		 Utils.deployKeycloak(generatedCreationKeycloak, keycloakCreationPvc, taskid, logsPath);
+		 Utils.deployKeycloakPod(generatedCreationKeycloak, keycloakCreationPvc, taskid, logsPath);
+		 System.out.println("create adress firewall");
+		 Utils.changeFirewallIpAddress(cluster, taskid, logsPath);
+		 System.out.println("deployment tls cert");
+		 Utils.createDomaineNameTlsCert(certFilePath, keyFilePath, taskid, logsPath);
 	}
 		
 	// subsctiption Id
@@ -625,6 +642,14 @@ public class FilemanagerServiceImpl {
 
 	public void setGeneratedCreationKeycloak(String generatedCreationKeycloak) {
 		this.generatedCreationKeycloak = generatedCreationKeycloak;
+	}
+
+	public Cluster getCluster() {
+		return cluster;
+	}
+
+	public void setCluster(Cluster cluster) {
+		this.cluster = cluster;
 	}
 
 
