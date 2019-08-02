@@ -1,10 +1,15 @@
 package com.activeviam.creator.service.impl;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -15,6 +20,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -260,14 +266,26 @@ public class FilemanagerServiceImpl {
 	}
 
 	// keycloak file generator
-	public String replaceKeycloakDeploymentFileContent(Cluster cluster) throws IOException {
+	public String replaceKeycloakDeploymentFileContent(Cluster cluster)  {
+		try {
 		Charset charset = StandardCharsets.UTF_8;
 		Path path=Paths.get(generatedCreationkeycloakFilePath);
 		String content = new String(Files.readAllBytes(path), charset);
-		content = content.replaceAll(DB_SERVER_NAME, cluster.getStandardAksName());
+		content = content.replace(DB_SERVER_NAME, cluster.getDbServerName());
+		
 		content = content.replaceAll(DB_NAME, cluster.getDbName());
-		Files.write(path, content.getBytes(charset));
-		return content;
+	
+		try (Writer writer = new BufferedWriter(new FileWriter(path.toString()))) {
+		    writer.write(content);
+		} catch (IOException e) {
+		    e.printStackTrace();
+		}//
+			
+		 content = new String(Files.readAllBytes(path), charset);
+		 return content;
+		} catch (IOException e) {
+System.out.println(e.getMessage());
+			return "****";		}
 	}
 	
 	@Async("threadPoolTaskExecutor")
@@ -356,7 +374,6 @@ public class FilemanagerServiceImpl {
 	public void connectUser(Cluster cluster,int taskid) throws IOException {
 		
 	String login=	"az login --service-principal --username "+clientId+ " --password "+clientSecret+" --tenant "+tenantId;		
-	System.out.println(login);
 	ProcessBuilder builder = new ProcessBuilder();
 	builder.command("bash", "-c",login);
 	Process process= builder.start();
@@ -374,7 +391,6 @@ public class FilemanagerServiceImpl {
 	Files.write(path, output.toString().getBytes(charset),StandardOpenOption.APPEND);
 	
 	String mergeaks ="az aks get-credentials --resource-group " +cluster.getAksName()+ " --name " +cluster.getStandardAksName()+ " --subscription "+cluster.getSubscriptionId();
-	System.out.println(mergeaks);
 	ProcessBuilder builderMerge = new ProcessBuilder();
 	builderMerge.command("bash", "-c",mergeaks);
 	Process processMerge= builderMerge.start();
@@ -397,10 +413,8 @@ public class FilemanagerServiceImpl {
 		 Utils.applyNginxController(generatedCreationIngress, taskid, logsPath);
 		 Utils.deployKeycloak(generatedCreationKeycloak, keycloakCreationPvc, taskid, logsPath);
 		 Utils.deployKeycloakPod(generatedCreationKeycloak, keycloakCreationPvc, taskid, logsPath);
-		 System.out.println("create adress firewall");
 		 Utils.changeFirewallIpAddress(cluster, taskid, logsPath);
-		 System.out.println("deployment tls cert");
-		 Utils.createDomaineNameTlsCert(certFilePath, keyFilePath, taskid, logsPath);
+ 		 Utils.createDomaineNameTlsCert(certFilePath, keyFilePath, taskid, logsPath);
 	}
 		
 	// subsctiption Id
@@ -426,13 +440,7 @@ public class FilemanagerServiceImpl {
 
 	// generate secrets from base 64
 	public String generateSecrets( String pwd) throws IOException{
-//		String generateBase = "echo -n \""+pwd+"\" | base64";
-//		ProcessBuilder builder = new ProcessBuilder(generateBase);
-//		Process process= builder.start();
-// 		BufferedReader reader = new BufferedReader(
-//				new InputStreamReader(process.getInputStream()));	
         Base64.Encoder encoder = Base64.getEncoder();  
-
 		String line=encoder.encodeToString(pwd.getBytes());
 		return line;
 	}
@@ -477,17 +485,7 @@ public class FilemanagerServiceImpl {
 		LOGGER.error(file);
 		return output.toString();
 	}
-	
-	//create keycloak yaml file
-	public void createKeycloak(Cluster cluster) throws IOException {
-		Charset charset = StandardCharsets.UTF_8;
-		Path path = Paths.get(generatedCreationIngress);
-		String content = new String(Files.readAllBytes(path), charset);
-		content = content.replaceAll(DB_SERVER_NAME, cluster.getDbServerName());
-		content = content.replaceAll(DB_NAME, cluster.getDbName());
-		Files.write(path, content.getBytes(charset));
-	}
-	
+		
 	//create ingress yaml file 
 	public void createIngress(Cluster cluster) throws IOException {
 		Charset charset = StandardCharsets.UTF_8;
@@ -663,8 +661,55 @@ public class FilemanagerServiceImpl {
 	}
 
 	public void setCluster(Cluster cluster) {
-		cluster.setAksName(cluster.getAksName()+cluster.getTag());
 		this.cluster = cluster;
+	}
+
+    public void fileGenerator(String filePath,String templatefile) throws IOException {
+    	File copied = new File(filePath);
+		FileUtils.copyFile(new File(templatefile), copied);
+    }
+
+	public void generateFiles(Cluster cluster) throws IOException {
+
+		Cluster completeCluster = Utils.createCompleteClusterInformations(cluster, dbAdminUsername, keycloakUser, dockerUserName, dockerEmail);
+
+		this.setCluster(completeCluster);
+		fileGenerator(getGeneratedAKSFilePath(), getTemplateAKSFilePath());
+		replaceFileContent(Paths.get(getGeneratedAKSFilePath()), completeCluster);
+    	
+		fileGenerator(getGeneratedCreationGroupFilePath(), getTemplateCreationResourceGroupFilePath());
+		replaceResourceGroupCreationFileContent(Paths.get(getGeneratedCreationGroupFilePath()), completeCluster);
+
+		fileGenerator(getGeneratedStandardFilePath(), getTemplateStandardFilePath());
+		standardAksCreator(completeCluster);
+		
+		//ServerDB
+		fileGenerator(getGeneratedCreationdbserverFilePath(), getTemplateCreationdbserverFilePath());
+		replaceDbServerFileContent(Paths.get(getGeneratedCreationdbserverFilePath()), completeCluster);
+
+		// DB file path
+		fileGenerator(getGeneratedCreationdbFilePath(), getTemplateCreationdbFilePath());
+		replaceDbFileContent(Paths.get(getGeneratedCreationdbFilePath()),completeCluster);
+		// keycloak file 
+		fileGenerator(getGeneratedCreationkeycloakFilePath(), getTemplateCreationkeycloakFilePath());
+		replaceKeycloakDeploymentFileContent(completeCluster);
+		// keycloak secret
+		fileGenerator(getGeneratedCreationkeycloakSecretFilePath(), getTemplateCreationkeycloakSecretFilePath());
+		createSecretKeycloak(completeCluster);
+		// db secret
+		fileGenerator(getGeneratedCreationSecretDBFilePath(), getTemplateCreationSecretDBFilePath());
+		createSecretDB(completeCluster);
+
+		// INGRESS  
+		fileGenerator(getGeneratedCreationIngress(), getTemplateCreationIngress());
+		createIngress(completeCluster);
+
+		// keycloak  
+//		fileGenerator(getGeneratedCreationKeycloak(), getTemplateCreationKeycloak());
+//		createKeycloak(completeCluster);
+
+		
+		
 	}
 
 

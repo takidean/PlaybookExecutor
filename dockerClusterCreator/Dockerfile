@@ -88,6 +88,9 @@ COPY template_standard_cluster.yaml /opt/builder/template_standard_cluster.yaml
 COPY template_cluster_tocreate.yaml /opt/builder/template_cluster_tocreate.yaml
 COPY clusterCreator.war /opt/builder/clusterCreator.war
 COPY external.properties /opt/builder/external.properties
+COPY /opt/builder/tls.key /opt/builder/tls.key
+COPY /opt/builder/tls.crt /opt/builder/tls.crt
+
 RUN chmod +wx /opt/builder/clusterCreator.war
 RUN apk update
 RUN apk fetch openjdk8

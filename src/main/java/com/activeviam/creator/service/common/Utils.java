@@ -40,17 +40,14 @@ public class Utils {
 		String installNginx ="helm install --name ngin-ingress stable/nginx-ingress";
 		Path path = Paths.get(logsPath + "/" + id + ".txt");
 
- 		System.out.println(installNginx);
 		ProcessBuilder builderFileNginx = new ProcessBuilder();
 		builderFileNginx.command("bash", "-c",installNginx);
 		Process processFileNginx = builderFileNginx.start();
 		Charset charset = StandardCharsets.UTF_8;
 		StringBuilder output = new StringBuilder();
-		System.out.println("****");
 		BufferedReader readerFileNginx = new BufferedReader(new InputStreamReader(processFileNginx.getInputStream()));
 		String line = "";
 		while ((line = readerFileNginx.readLine()) != null) {
-			System.out.println(line );
 			output.append(line + "\n");
 		}
 		Files.write(path, output.toString().getBytes(charset), StandardOpenOption.APPEND);
@@ -59,7 +56,6 @@ public class Utils {
 	//Helm apply nginx controller
 	
 	public static void applyNginxController(String fileNginxPath, int id, String logsPath) throws IOException {
-	System.out.println(" *** * * *apply nginx Controller ");
 	Path path = Paths.get(logsPath + "/" + id + ".txt");
 
 	String kubeApplyIngress = "kubectl apply -f " + fileNginxPath;
@@ -72,7 +68,6 @@ public class Utils {
 	BufferedReader readerFileNginx = new BufferedReader(new InputStreamReader(processFileNginx.getInputStream()));
 	String line = "";
 	while ((line = readerFileNginx.readLine()) != null) {
-		System.out.println(line );
 		output.append(line + "\n");
 	}
 	Files.write(path, output.toString().getBytes(charset), StandardOpenOption.APPEND);
@@ -86,13 +81,11 @@ public class Utils {
 		ProcessBuilder builder = new ProcessBuilder();
 		builder.command("bash", "-c",installNginx);
 		Process process = builder.start();
-		System.out.println("deployKeycloak ------------------ kubectl apply -f keycloak ");
 		Charset charset = StandardCharsets.UTF_8;
 		StringBuilder output = new StringBuilder();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 		String line = "";
 		while ((line = reader.readLine()) != null) {
-			System.out.println(line);
 			output.append(line + "\n");
 		}
 		Files.write(path, output.toString().getBytes(charset), StandardOpenOption.APPEND);
@@ -107,12 +100,10 @@ public class Utils {
 	Process processFileKeycloakDep = builderFileKeycloakDep.start();
 	Charset charset = StandardCharsets.UTF_8;
 	Path path = Paths.get(logsPath + "/" + id + ".txt");
-	System.out.println("Deploy keycloak pod");
 	String line = "";
 	StringBuilder output = new StringBuilder();
 	BufferedReader readerFileKeycloakDep = new BufferedReader(new InputStreamReader(processFileKeycloakDep.getInputStream()));
 		while ((line = readerFileKeycloakDep.readLine()) != null) {
-			System.out.println(line);
 		output.append(line + "\n");
 	}
 	Files.write(path, output.toString().getBytes(charset), StandardOpenOption.APPEND);
@@ -169,7 +160,6 @@ public class Utils {
 				new InputStreamReader(process.getInputStream()));	
 		String line="";
 		while ((line = reader.readLine()) != null) {
-			System.out.println("**************** " + line);
 			output.append(line + "\n");
 		}
 		Path path = Paths.get(logsPath + "/" + taskid + ".txt");
@@ -181,7 +171,6 @@ public class Utils {
 	
 	public static void createDomaineNameTlsCert(String certFilePath,String keyFilePath,int taskid, String logsPath) throws IOException {
 		String createCertificate=	"kubectl create secret tls active-tls-cert --key "+keyFilePath+" --cert "+certFilePath;
-		System.out.println("create tls secret"+keyFilePath +" cert " +certFilePath);
 		ProcessBuilder builder = new ProcessBuilder();
 		builder.command("bash", "-c",createCertificate);
 		Process process= builder.start();
@@ -191,7 +180,6 @@ public class Utils {
 				new InputStreamReader(process.getInputStream()));	
 		String line="";
 		while ((line = reader.readLine()) != null) {
-			System.out.println("**************** " + line);
 			output.append(line + "\n");
 		}
 		Path path = Paths.get(logsPath + "/" + taskid + ".txt");
@@ -212,7 +200,7 @@ public class Utils {
 		clusterComplete.setDockerPassword(cluster.getDockerPassword()); 
 		clusterComplete.setDbServerName("dbserver"+standardAksName);
 		clusterComplete.setDbName("db"+standardAksName);
-
+		clusterComplete.setTag(cluster.getTag());
 		clusterComplete.setDbAdminUsername(dbAdminUsername);
 		clusterComplete.setKeycloakUser(keycloakUser);
 		clusterComplete.setDockerUserName(dockerUserName);

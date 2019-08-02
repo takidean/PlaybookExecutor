@@ -30,6 +30,7 @@ import com.activeviam.creator.model.Refresh;
 import com.activeviam.creator.model.Task;
 import com.activeviam.creator.service.DeveloperService;
 import com.activeviam.creator.service.TaskService;
+import com.activeviam.creator.service.common.Utils;
 import com.activeviam.creator.service.impl.FilemanagerServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -190,57 +191,18 @@ public class UserController {
   
     
     @PostMapping("/createcluster")
-    public String  startSubmit(@ModelAttribute("cluster") Cluster cluster,Principal principal,@RequestParam("ssl_certificate") MultipartFile ssl_certificate, @RequestParam("key") MultipartFile key )  {
+    public String  startSubmit(@ModelAttribute("cluster") Cluster cluster,Principal principal )  {
      	if(developerService.validateDeveloper(principal.getName())) {
     	try {
+    		
             filemanagerServiceImpl.setCluster(cluster);
             
     		filemanagerServiceImpl.replaceSubscriptionId(cluster.getSubscriptionId());
     		
-			fileGenerator(filemanagerServiceImpl.getGeneratedAKSFilePath(), filemanagerServiceImpl.getTemplateAKSFilePath());
-			filemanagerServiceImpl.replaceFileContent(Paths.get(filemanagerServiceImpl.getGeneratedAKSFilePath()), cluster);
-	    	
-			fileGenerator(filemanagerServiceImpl.getGeneratedCreationGroupFilePath(), filemanagerServiceImpl.getTemplateCreationResourceGroupFilePath());
-			filemanagerServiceImpl.replaceResourceGroupCreationFileContent(Paths.get(filemanagerServiceImpl.getGeneratedCreationGroupFilePath()), cluster);
-
-			fileGenerator(filemanagerServiceImpl.getGeneratedStandardFilePath(), filemanagerServiceImpl.getTemplateStandardFilePath());
-			filemanagerServiceImpl.standardAksCreator(cluster);
-			
-			//ServerDB
-			fileGenerator(filemanagerServiceImpl.getGeneratedCreationdbserverFilePath(), filemanagerServiceImpl.getTemplateCreationdbserverFilePath());
-			filemanagerServiceImpl.replaceDbServerFileContent(Paths.get(filemanagerServiceImpl.getGeneratedCreationdbserverFilePath()), cluster);
-
-			// DB file path
-			fileGenerator(filemanagerServiceImpl.getGeneratedCreationdbFilePath(), filemanagerServiceImpl.getTemplateCreationdbFilePath());
-			filemanagerServiceImpl.replaceDbFileContent(Paths.get(filemanagerServiceImpl.getGeneratedCreationdbFilePath()), cluster);
-			// keycloak file 
-			fileGenerator(filemanagerServiceImpl.getGeneratedCreationkeycloakFilePath(), filemanagerServiceImpl.getTemplateCreationkeycloakFilePath());
-			filemanagerServiceImpl.replaceKeycloakDeploymentFileContent(cluster);
-			// keycloak secret
-			fileGenerator(filemanagerServiceImpl.getGeneratedCreationkeycloakSecretFilePath(), filemanagerServiceImpl.getTemplateCreationkeycloakSecretFilePath());
-			filemanagerServiceImpl.createSecretKeycloak(cluster);
-			// db secret
-			fileGenerator(filemanagerServiceImpl.getGeneratedCreationSecretDBFilePath(), filemanagerServiceImpl.getTemplateCreationSecretDBFilePath());
-			filemanagerServiceImpl.createSecretDB(cluster);
-
-			// INGRESS  
-			fileGenerator(filemanagerServiceImpl.getGeneratedCreationIngress(), filemanagerServiceImpl.getTemplateCreationIngress());
-			filemanagerServiceImpl.createIngress(cluster);
-
-			// keycloak  
-			fileGenerator(filemanagerServiceImpl.getGeneratedCreationKeycloak(), filemanagerServiceImpl.getTemplateCreationKeycloak());
-			filemanagerServiceImpl.createKeycloak(cluster);
-
-			// certif file 
-	            byte[] bytes = ssl_certificate.getBytes();
-	            Path path = Paths.get(filemanagerServiceImpl.getCertFilePath() + ssl_certificate.getOriginalFilename());
-	            Files.write(path, bytes);
-
-	             bytes = key.getBytes();
-	              path = Paths.get(filemanagerServiceImpl.getKeyFilePath() + key.getOriginalFilename());
-	            Files.write(path, bytes);
 	 
-	            filemanagerServiceImpl.setCluster(cluster);
+           filemanagerServiceImpl.setCluster(cluster);
+    		filemanagerServiceImpl.generateFiles(cluster);
+
     	} catch (IOException e) {
 			LOGGER.error("a problem with your file ", e);
  		}
