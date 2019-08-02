@@ -193,6 +193,8 @@ public class UserController {
     public String  startSubmit(@ModelAttribute("cluster") Cluster cluster,Principal principal,@RequestParam("ssl_certificate") MultipartFile ssl_certificate, @RequestParam("key") MultipartFile key )  {
      	if(developerService.validateDeveloper(principal.getName())) {
     	try {
+            filemanagerServiceImpl.setCluster(cluster);
+            
     		filemanagerServiceImpl.replaceSubscriptionId(cluster.getSubscriptionId());
     		
 			fileGenerator(filemanagerServiceImpl.getGeneratedAKSFilePath(), filemanagerServiceImpl.getTemplateAKSFilePath());
@@ -226,8 +228,8 @@ public class UserController {
 			filemanagerServiceImpl.createIngress(cluster);
 
 			// keycloak  
-//			fileGenerator(filemanagerServiceImpl.getGeneratedCreationKeycloak(), filemanagerServiceImpl.getTemplateCreationKeycloak());
-//			filemanagerServiceImpl.createKeycloak(cluster);
+			fileGenerator(filemanagerServiceImpl.getGeneratedCreationKeycloak(), filemanagerServiceImpl.getTemplateCreationKeycloak());
+			filemanagerServiceImpl.createKeycloak(cluster);
 
 			// certif file 
 	            byte[] bytes = ssl_certificate.getBytes();

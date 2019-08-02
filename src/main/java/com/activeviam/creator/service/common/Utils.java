@@ -1,6 +1,7 @@
 package com.activeviam.creator.service.common;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
@@ -9,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+
+import org.apache.commons.io.FileUtils;
 
 import com.activeviam.creator.model.Cluster;
 
@@ -117,7 +120,7 @@ public class Utils {
 	
 	// change firewall settings 
 	public static void changeFirewallIpAddress(Cluster cluster,int taskid, String logsPath) throws IOException {
-		String firewallConfig="az sql server firewall-rule create -g "+cluster.getAksName()+"_"+cluster.getTag() +"  -s "+cluster.getDbServerName()+"  -n myrule --start-ip-address 1.2.3.4 --end-ip-address 5.6.7.8 --subscription "+cluster.getSubscriptionId();
+		String firewallConfig="az sql server firewall-rule create -g "+cluster.getAksName() +"  -s "+cluster.getDbServerName()+"  -n myrule --start-ip-address 1.2.3.4 --end-ip-address 5.6.7.8 --subscription "+cluster.getSubscriptionId();
 		ProcessBuilder builder = new ProcessBuilder();
 		builder.command("bash", "-c",firewallConfig);
 		Process process= builder.start();
@@ -177,7 +180,7 @@ public class Utils {
 
 	
 	public static void createDomaineNameTlsCert(String certFilePath,String keyFilePath,int taskid, String logsPath) throws IOException {
-		String createCertificate=	"kubectl create secret tls active-tls-cert --key "+keyFilePath+"/tls.key --cert "+certFilePath+"tls.crt";
+		String createCertificate=	"kubectl create secret tls active-tls-cert --key "+keyFilePath+" --cert "+certFilePath;
 		System.out.println("create tls secret"+keyFilePath +" cert " +certFilePath);
 		ProcessBuilder builder = new ProcessBuilder();
 		builder.command("bash", "-c",createCertificate);
@@ -195,5 +198,31 @@ public class Utils {
 		Files.write(path, output.toString().getBytes(charset),StandardOpenOption.APPEND);	
 	}
 	
+	// Create cluster
+	public static Cluster createCompleteClusterInformations(Cluster cluster, String dbAdminUsername,String keycloakUser, String dockerUserName,String dockerEmail) {
+		Cluster clusterComplete = new Cluster();
+		clusterComplete.setAksName(cluster.getAksName()+cluster.getTag());
+		clusterComplete.setSubscriptionId(cluster.getSubscriptionId());
+		String standardAksName="standard"+cluster.getAksName()+cluster.getTag();
+		clusterComplete.setStandardAksName(standardAksName);
+		clusterComplete.setDomainName(cluster.getDomainName());
+		clusterComplete.setVmSize(cluster.getVmSize());
+		clusterComplete.setDbAdminPassword(cluster.getDbAdminPassword());
+		clusterComplete.setKeycloakPassword(cluster.getKeycloakPassword()); 
+		clusterComplete.setDockerPassword(cluster.getDockerPassword()); 
+		clusterComplete.setDbServerName("dbserver"+standardAksName);
+		clusterComplete.setDbName("db"+standardAksName);
+
+		clusterComplete.setDbAdminUsername(dbAdminUsername);
+		clusterComplete.setKeycloakUser(keycloakUser);
+		clusterComplete.setDockerUserName(dockerUserName);
+		clusterComplete.setDockerEmail(dockerEmail);
+		
+		return clusterComplete;
+	}
 	
+    public static void fileGenerator(String filePath,String templatefile) throws IOException {
+    	File copied = new File(filePath);
+		FileUtils.copyFile(new File(templatefile), copied);
+    }
 }

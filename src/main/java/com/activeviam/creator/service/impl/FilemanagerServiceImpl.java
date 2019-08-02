@@ -38,7 +38,6 @@ public class FilemanagerServiceImpl {
 	private String SUBSCRIPTION_ID="subscription_id";
 	private String AKS_CLUSTER_CREATION="creation aks cluster";
 	private String RESOURCE_GROUP_VALUE="resource_group_value";
-	private String STANDARD="standard";
 	private String AKS_NAME="aks_name_value";
 	private String SSH_PATH="/.ssh/id_rsa.pub";
 	private String SSH_RSA_VALUE="ssh-rsa_value";
@@ -150,9 +149,21 @@ public class FilemanagerServiceImpl {
 
 	@Value("${keycloak.generatedfile.path}")
 	String generatedCreationKeycloak;
+
+	@Value("${dbAdminUsername}")
+	String dbAdminUsername;
+
+	@Value("${keycloakUser}")
+	String keycloakUser;
+
+	@Value("${dockerUserName}")
+	String dockerUserName;
+
+	@Value("${dockerEmail}")
+	String dockerEmail;
+
 	
-	@Value("${storageclass.generatedfile.path}")
-	String StorageClassFile;
+	
 	Cluster cluster;
 	
 	public String getTemplateCreationIngress() {
@@ -181,7 +192,7 @@ public class FilemanagerServiceImpl {
 				
 		Charset charset = StandardCharsets.UTF_8;
 		String content = new String(Files.readAllBytes(path), charset);
-		content = content.replaceAll(RESOURCE_GROUP_VALUE, cluster.getAksName()+"_"+cluster.getTag());
+		content = content.replaceAll(RESOURCE_GROUP_VALUE, cluster.getAksName());
 		content = content.replaceAll(AKS_NAME, cluster.getAksName());
 		String ssh_key= new String(Files.readAllBytes(Paths.get(System.getProperty("user.home")+SSH_PATH)));  
 		content = content.replaceAll(SSH_RSA_VALUE, ssh_key);
@@ -202,7 +213,7 @@ public class FilemanagerServiceImpl {
 		content = content.replaceAll(SSH_RSA_VALUE, ssh_key);
 		content = content.replaceAll(CLIENT_ID_VALUE, clientId);
 		content = content.replaceAll(CLIENT_SECRET_VALUE, clientSecret);		
-		content = content.replaceAll(RESOURCE_GROUP_VALUE, cluster.getAksName()+"_"+cluster.getTag());
+		content = content.replaceAll(RESOURCE_GROUP_VALUE, cluster.getAksName());
 		Files.write(path, content.getBytes(charset));
 		return content;
 	}
@@ -212,7 +223,7 @@ public class FilemanagerServiceImpl {
 		
 		Charset charset = StandardCharsets.UTF_8;
 		String content = new String(Files.readAllBytes(path), charset);
-		content = content.replaceAll(RESOURCE_GROUP_VALUE, cluster.getAksName()+"_"+cluster.getTag());
+		content = content.replaceAll(RESOURCE_GROUP_VALUE, cluster.getAksName());
 		content = content.replaceAll(DB_SERVER_NAME, cluster.getDbServerName());
 		content = content.replaceAll(ADMIN_UN, cluster.getDbAdminUsername());
 		content = content.replaceAll(ADMIN_PWD, cluster.getDbAdminPassword());
@@ -225,7 +236,7 @@ public class FilemanagerServiceImpl {
 	public String replaceDbFileContent(Path path, Cluster cluster) throws IOException {
 		Charset charset = StandardCharsets.UTF_8;
 		String content = new String(Files.readAllBytes(path), charset);
-		content = content.replaceAll(RESOURCE_GROUP_VALUE, cluster.getAksName()+"_"+cluster.getTag());
+		content = content.replaceAll(RESOURCE_GROUP_VALUE, cluster.getAksName());
 		content = content.replaceAll(DB_SERVER_NAME, cluster.getDbServerName());	
 		content = content.replaceAll(DB_NAME, cluster.getDbServerName());		
 		Files.write(path, content.getBytes(charset));
@@ -237,8 +248,8 @@ public class FilemanagerServiceImpl {
 		Charset charset = StandardCharsets.UTF_8;
 		Path path=Paths.get(generatedStandardFilePath);
 		String content = new String(Files.readAllBytes(path), charset);
-		content = content.replaceAll(RESOURCE_GROUP_VALUE, cluster.getAksName()+"_"+cluster.getTag());
-		content = content.replaceAll(AKS_NAME, STANDARD+cluster.getAksName());
+		content = content.replaceAll(RESOURCE_GROUP_VALUE, cluster.getAksName());
+		content = content.replaceAll(AKS_NAME, cluster.getStandardAksName());
 		String ssh_key= new String(Files.readAllBytes(Paths.get(System.getProperty("user.home")+SSH_PATH)));  
 		content = content.replaceAll(SSH_RSA_VALUE, ssh_key);
 		content = content.replaceAll(CLIENT_ID_VALUE, clientId);
@@ -253,8 +264,7 @@ public class FilemanagerServiceImpl {
 		Charset charset = StandardCharsets.UTF_8;
 		Path path=Paths.get(generatedCreationkeycloakFilePath);
 		String content = new String(Files.readAllBytes(path), charset);
-		System.out.println(cluster.getDbServerName());
-		content = content.replaceAll(DB_SERVER_NAME, STANDARD+cluster.getDbServerName());
+		content = content.replaceAll(DB_SERVER_NAME, cluster.getStandardAksName());
 		content = content.replaceAll(DB_NAME, cluster.getDbName());
 		Files.write(path, content.getBytes(charset));
 		return content;
@@ -263,6 +273,7 @@ public class FilemanagerServiceImpl {
 	@Async("threadPoolTaskExecutor")
 	public void asyncPlayBookCreateRG(Cluster cluster,String name) throws Exception  {
 		try {
+			Cluster clusterComplete = Utils.createCompleteClusterInformations(cluster, dbAdminUsername, keycloakUser, dockerUserName, dockerEmail);
 			
 		ProcessBuilder builder = new ProcessBuilder("ansible-playbook", generatedCreationGroupFilePath);
 		Process process;
@@ -296,7 +307,7 @@ public class FilemanagerServiceImpl {
 					if(!resultCreationDB.contains("fatal")) {
 						taskToUpdate.setStatus(1);
 						taskService.save(taskToUpdate);
-						runDeploymentScripts(cluster, id);
+						runDeploymentScripts(clusterComplete, id);
 					}
 					}else {
 						taskToUpdate.setStatus(0);
@@ -362,7 +373,7 @@ public class FilemanagerServiceImpl {
 	Path path = Paths.get(logsPath + "/" + taskid + ".txt");
 	Files.write(path, output.toString().getBytes(charset),StandardOpenOption.APPEND);
 	
-	String mergeaks ="az aks get-credentials --resource-group " +cluster.getAksName()+"_"+cluster.getTag()+ " --name " +STANDARD+cluster.getAksName()+ " --subscription "+cluster.getSubscriptionId();
+	String mergeaks ="az aks get-credentials --resource-group " +cluster.getAksName()+ " --name " +cluster.getStandardAksName()+ " --subscription "+cluster.getSubscriptionId();
 	System.out.println(mergeaks);
 	ProcessBuilder builderMerge = new ProcessBuilder();
 	builderMerge.command("bash", "-c",mergeaks);
@@ -381,9 +392,6 @@ public class FilemanagerServiceImpl {
 	public void runDeploymentScripts(Cluster cluster,int taskid) throws IOException {
 		 connectUser(cluster,taskid);
 		 Utils.createSecretDocker(cluster, taskid,logsPath);
-		 Utils.applyKubeFiles(generatedCreationKeycloakSecretFilePath, taskid, logsPath);
-		 Utils.applyKubeFiles(generatedCreationSecretDBFilePath, taskid, logsPath);
-		 Utils.applyKubeFiles(StorageClassFile, taskid, logsPath);
 		 Utils.createNginx(generatedCreationIngress, taskid, logsPath);
 		 Utils.helmInstall( taskid, logsPath);
 		 Utils.applyNginxController(generatedCreationIngress, taskid, logsPath);
@@ -418,7 +426,13 @@ public class FilemanagerServiceImpl {
 
 	// generate secrets from base 64
 	public String generateSecrets( String pwd) throws IOException{
+//		String generateBase = "echo -n \""+pwd+"\" | base64";
+//		ProcessBuilder builder = new ProcessBuilder(generateBase);
+//		Process process= builder.start();
+// 		BufferedReader reader = new BufferedReader(
+//				new InputStreamReader(process.getInputStream()));	
         Base64.Encoder encoder = Base64.getEncoder();  
+
 		String line=encoder.encodeToString(pwd.getBytes());
 		return line;
 	}
@@ -649,6 +663,7 @@ public class FilemanagerServiceImpl {
 	}
 
 	public void setCluster(Cluster cluster) {
+		cluster.setAksName(cluster.getAksName()+cluster.getTag());
 		this.cluster = cluster;
 	}
 

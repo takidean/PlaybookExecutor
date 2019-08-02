@@ -17,6 +17,8 @@ public class Cluster {
 	private String dockerPassword;
 	private String dockerEmail;
 	private String domainName;
+	private String standardAksName;
+	
 	//
 	
 	public String getAksName() {
@@ -118,6 +120,14 @@ public class Cluster {
 	}
 	public void setDomainName(String domainName) {
 		this.domainName = domainName;
+	}
+
+	public String getStandardAksName() {
+		return standardAksName;
+	}
+
+	public void setStandardAksName(String standardAksName) {
+		this.standardAksName = standardAksName;
 	}
 	
 	
