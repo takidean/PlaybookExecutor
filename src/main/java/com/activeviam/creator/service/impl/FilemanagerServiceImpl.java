@@ -150,7 +150,9 @@ public class FilemanagerServiceImpl {
 
 	@Value("${keycloak.generatedfile.path}")
 	String generatedCreationKeycloak;
-
+	
+	@Value("${storageclass.generatedfile.path}")
+	String StorageClassFile;
 	Cluster cluster;
 	
 	public String getTemplateCreationIngress() {
@@ -251,6 +253,7 @@ public class FilemanagerServiceImpl {
 		Charset charset = StandardCharsets.UTF_8;
 		Path path=Paths.get(generatedCreationkeycloakFilePath);
 		String content = new String(Files.readAllBytes(path), charset);
+		System.out.println(cluster.getDbServerName());
 		content = content.replaceAll(DB_SERVER_NAME, STANDARD+cluster.getDbServerName());
 		content = content.replaceAll(DB_NAME, cluster.getDbName());
 		Files.write(path, content.getBytes(charset));
@@ -378,8 +381,11 @@ public class FilemanagerServiceImpl {
 	public void runDeploymentScripts(Cluster cluster,int taskid) throws IOException {
 		 connectUser(cluster,taskid);
 		 Utils.createSecretDocker(cluster, taskid,logsPath);
+		 Utils.applyKubeFiles(generatedCreationKeycloakSecretFilePath, taskid, logsPath);
+		 Utils.applyKubeFiles(generatedCreationSecretDBFilePath, taskid, logsPath);
+		 Utils.applyKubeFiles(StorageClassFile, taskid, logsPath);
 		 Utils.createNginx(generatedCreationIngress, taskid, logsPath);
-		 Utils.helmInstall(generatedCreationIngress, taskid, logsPath);
+		 Utils.helmInstall( taskid, logsPath);
 		 Utils.applyNginxController(generatedCreationIngress, taskid, logsPath);
 		 Utils.deployKeycloak(generatedCreationKeycloak, keycloakCreationPvc, taskid, logsPath);
 		 Utils.deployKeycloakPod(generatedCreationKeycloak, keycloakCreationPvc, taskid, logsPath);
@@ -412,13 +418,7 @@ public class FilemanagerServiceImpl {
 
 	// generate secrets from base 64
 	public String generateSecrets( String pwd) throws IOException{
-//		String generateBase = "echo -n \""+pwd+"\" | base64";
-//		ProcessBuilder builder = new ProcessBuilder(generateBase);
-//		Process process= builder.start();
-// 		BufferedReader reader = new BufferedReader(
-//				new InputStreamReader(process.getInputStream()));	
         Base64.Encoder encoder = Base64.getEncoder();  
-
 		String line=encoder.encodeToString(pwd.getBytes());
 		return line;
 	}

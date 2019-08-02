@@ -226,8 +226,8 @@ public class UserController {
 			filemanagerServiceImpl.createIngress(cluster);
 
 			// keycloak  
-			fileGenerator(filemanagerServiceImpl.getGeneratedCreationKeycloak(), filemanagerServiceImpl.getTemplateCreationKeycloak());
-			filemanagerServiceImpl.createKeycloak(cluster);
+//			fileGenerator(filemanagerServiceImpl.getGeneratedCreationKeycloak(), filemanagerServiceImpl.getTemplateCreationKeycloak());
+//			filemanagerServiceImpl.createKeycloak(cluster);
 
 			// certif file 
 	            byte[] bytes = ssl_certificate.getBytes();

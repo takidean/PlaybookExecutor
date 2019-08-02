@@ -33,21 +33,21 @@ public class Utils {
 	}
 	
 	//install Helm
-	public static void helmInstall(String fileNginxPath, int id, String logsPath) throws IOException {
-		String installNginx = "helm install --name nginx-ingress stable/nginx-ingress";
+	public static void helmInstall( int id, String logsPath) throws IOException {
+		String installNginx ="helm install --name ngin-ingress stable/nginx-ingress";
 		Path path = Paths.get(logsPath + "/" + id + ".txt");
 
-		ProcessBuilder builderInstall = new ProcessBuilder();
-		builderInstall.command("bash", "-c",installNginx);
-		Process processInstall = builderInstall.start();
+ 		System.out.println(installNginx);
+		ProcessBuilder builderFileNginx = new ProcessBuilder();
+		builderFileNginx.command("bash", "-c",installNginx);
+		Process processFileNginx = builderFileNginx.start();
 		Charset charset = StandardCharsets.UTF_8;
 		StringBuilder output = new StringBuilder();
-
-		BufferedReader readerInstall = new BufferedReader(new InputStreamReader(processInstall.getInputStream()));
+		System.out.println("****");
+		BufferedReader readerFileNginx = new BufferedReader(new InputStreamReader(processFileNginx.getInputStream()));
 		String line = "";
-		System.out.println("*------------ helm install ");
-		while ((line = readerInstall.readLine()) != null) {
-		System.out.println(line);
+		while ((line = readerFileNginx.readLine()) != null) {
+			System.out.println(line );
 			output.append(line + "\n");
 		}
 		Files.write(path, output.toString().getBytes(charset), StandardOpenOption.APPEND);
@@ -154,6 +154,28 @@ public class Utils {
 	Files.write(path, output.toString().getBytes(charset),StandardOpenOption.APPEND);
 	}
 	
+	//Secret Creation
+	public static void applyKubeFiles(String generatedCreationKeycloakSecretFilePath ,int taskid, String logsPath) throws IOException {
+		String createKeycloakSecret="kubectl apply -f "+generatedCreationKeycloakSecretFilePath;
+		ProcessBuilder builder = new ProcessBuilder();
+		builder.command("bash", "-c",createKeycloakSecret);
+		Process process= builder.start();
+		Charset charset = StandardCharsets.UTF_8;
+		StringBuilder output = new StringBuilder();
+		BufferedReader reader = new BufferedReader(
+				new InputStreamReader(process.getInputStream()));	
+		String line="";
+		while ((line = reader.readLine()) != null) {
+			System.out.println("**************** " + line);
+			output.append(line + "\n");
+		}
+		Path path = Paths.get(logsPath + "/" + taskid + ".txt");
+		Files.write(path, output.toString().getBytes(charset),StandardOpenOption.APPEND);	
+
+	}
+	
+
+	
 	public static void createDomaineNameTlsCert(String certFilePath,String keyFilePath,int taskid, String logsPath) throws IOException {
 		String createCertificate=	"kubectl create secret tls active-tls-cert --key "+keyFilePath+"/tls.key --cert "+certFilePath+"tls.crt";
 		System.out.println("create tls secret"+keyFilePath +" cert " +certFilePath);
@@ -172,5 +194,6 @@ public class Utils {
 		Path path = Paths.get(logsPath + "/" + taskid + ".txt");
 		Files.write(path, output.toString().getBytes(charset),StandardOpenOption.APPEND);	
 	}
+	
 	
 }
