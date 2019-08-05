@@ -168,7 +168,11 @@ public class FilemanagerServiceImpl {
 	@Value("${dockerEmail}")
 	String dockerEmail;
 
+	@Value("${storageclass.generatedfile.path}")
+	String storageClass;
 	
+	@Value("${keycloakservice.generatedfile.path}")
+	String fileKeycloakServicePath;
 	
 	Cluster cluster;
 	
@@ -289,11 +293,11 @@ System.out.println(e.getMessage());
 	}
 	
 	@Async("threadPoolTaskExecutor")
-	public void asyncPlayBookCreateRG(Cluster cluster,String name) throws Exception  {
+	public void asyncPlayBookCreateRG(Cluster clusterComplete,String name) throws Exception  {
 		try {
-			Cluster clusterComplete = Utils.createCompleteClusterInformations(cluster, dbAdminUsername, keycloakUser, dockerUserName, dockerEmail);
-			
-		ProcessBuilder builder = new ProcessBuilder("ansible-playbook", generatedCreationGroupFilePath);
+			System.out.println("asyncPlayBookCreateRG "+cluster.getAksName());
+	//		Cluster clusterComplete = Utils.createCompleteClusterInformations(cluster, dbAdminUsername, keycloakUser, dockerUserName, dockerEmail);
+ 		ProcessBuilder builder = new ProcessBuilder("ansible-playbook", generatedCreationGroupFilePath);
 		Process process;
 		  LocalDate date = LocalDate.now();
 		  DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
@@ -371,7 +375,7 @@ System.out.println(e.getMessage());
 
 	//connect az user to aks cluster
 	@Async("threadPoolTaskExecutor")
-	public void connectUser(Cluster cluster,int taskid) throws IOException {
+	public void connectUser(Cluster cluster,int taskid) throws IOException, InterruptedException {
 		
 	String login=	"az login --service-principal --username "+clientId+ " --password "+clientSecret+" --tenant "+tenantId;		
 	ProcessBuilder builder = new ProcessBuilder();
@@ -380,7 +384,7 @@ System.out.println(e.getMessage());
 
 	Charset charset = StandardCharsets.UTF_8;
 	StringBuilder output = new StringBuilder();	
-
+System.out.println(login);
 	BufferedReader reader = new BufferedReader(
 			new InputStreamReader(process.getInputStream()));	
 	String line="";
@@ -391,10 +395,10 @@ System.out.println(e.getMessage());
 	Files.write(path, output.toString().getBytes(charset),StandardOpenOption.APPEND);
 	
 	String mergeaks ="az aks get-credentials --resource-group " +cluster.getAksName()+ " --name " +cluster.getStandardAksName()+ " --subscription "+cluster.getSubscriptionId();
+	System.out.println(mergeaks);
 	ProcessBuilder builderMerge = new ProcessBuilder();
 	builderMerge.command("bash", "-c",mergeaks);
 	Process processMerge= builderMerge.start();
-
 	BufferedReader readerMerge = new BufferedReader(
 			new InputStreamReader(processMerge.getInputStream()));	
 
@@ -405,17 +409,26 @@ System.out.println(e.getMessage());
 	}
 	
 	// start deploying
-	public void runDeploymentScripts(Cluster cluster,int taskid) throws IOException {
-		 connectUser(cluster,taskid);
+	public void runDeploymentScripts(Cluster cluster,int taskid) throws IOException, InterruptedException {
+		System.out.println(cluster.getAksName()+" runDeploymentScripts"); 
+		connectUser(cluster,taskid);
+		 Utils.applyKubeFiles(generatedCreationSecretDBFilePath, taskid, logsPath);
+		 Utils.applyKubeFiles(generatedCreationKeycloakSecretFilePath,taskid, logsPath);
+		 Utils.applyKubeFiles(storageClass, taskid, logsPath);
+		 Utils.applyKubeFiles(fileKeycloakServicePath, taskid, logsPath);
 		 Utils.createSecretDocker(cluster, taskid,logsPath);
 		 Utils.createNginx(generatedCreationIngress, taskid, logsPath);
-		 Utils.helmInstall( taskid, logsPath);
 		 Utils.applyNginxController(generatedCreationIngress, taskid, logsPath);
-		 Utils.deployKeycloak(generatedCreationKeycloak, keycloakCreationPvc, taskid, logsPath);
-		 Utils.deployKeycloakPod(generatedCreationKeycloak, keycloakCreationPvc, taskid, logsPath);
 		 Utils.changeFirewallIpAddress(cluster, taskid, logsPath);
  		 Utils.createDomaineNameTlsCert(certFilePath, keyFilePath, taskid, logsPath);
+ 		
+ 		 Utils.helmInstall( taskid, logsPath);
+		 Utils.deployKeycloak(generatedCreationKeycloak, keycloakCreationPvc, taskid, logsPath);
+		 Utils.deployKeycloakPod(generatedCreationKeycloak, keycloakCreationPvc, taskid, logsPath);
+		 
+		
 	}
+	
 		
 	// subsctiption Id
 	public void replaceSubscriptionId(String subscriptionId) {

@@ -24,7 +24,6 @@ public class Utils {
 		ProcessBuilder builder = new ProcessBuilder();
 		builder.command("bash", "-c",installInit);
 		Process process = builder.start();
-
 		Charset charset = StandardCharsets.UTF_8;
 		StringBuilder output = new StringBuilder();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -36,33 +35,41 @@ public class Utils {
 	}
 	
 	//install Helm
-	public static void helmInstall( int id, String logsPath) throws IOException {
+	public static void helmInstall( int id, String logsPath) throws IOException, InterruptedException {
 		String installNginx ="helm install --name ngin-ingress stable/nginx-ingress";
 		Path path = Paths.get(logsPath + "/" + id + ".txt");
 
 		ProcessBuilder builderFileNginx = new ProcessBuilder();
 		builderFileNginx.command("bash", "-c",installNginx);
 		Process processFileNginx = builderFileNginx.start();
+
 		Charset charset = StandardCharsets.UTF_8;
 		StringBuilder output = new StringBuilder();
 		BufferedReader readerFileNginx = new BufferedReader(new InputStreamReader(processFileNginx.getInputStream()));
 		String line = "";
 		while ((line = readerFileNginx.readLine()) != null) {
 			output.append(line + "\n");
+		
+		}
+		
+		if(!output.toString().contains("DEPLOYED")) {
+		Thread.sleep(5000, 0);
+			helmInstall(id, logsPath);
 		}
 		Files.write(path, output.toString().getBytes(charset), StandardOpenOption.APPEND);
 	}
 	
 	//Helm apply nginx controller
 	
-	public static void applyNginxController(String fileNginxPath, int id, String logsPath) throws IOException {
+	public static void applyNginxController(String fileNginxPath, int id, String logsPath) throws IOException, InterruptedException {
 	Path path = Paths.get(logsPath + "/" + id + ".txt");
 
 	String kubeApplyIngress = "kubectl apply -f " + fileNginxPath;
 	ProcessBuilder builderFileNginx = new ProcessBuilder();
 	builderFileNginx.command("bash", "-c",kubeApplyIngress);
+	System.out.println(kubeApplyIngress);
 	Process processFileNginx = builderFileNginx.start();
-	Charset charset = StandardCharsets.UTF_8;
+ 	Charset charset = StandardCharsets.UTF_8;
 	StringBuilder output = new StringBuilder();
 
 	BufferedReader readerFileNginx = new BufferedReader(new InputStreamReader(processFileNginx.getInputStream()));
@@ -75,12 +82,13 @@ public class Utils {
 
 	
 	public static void deployKeycloak(String fileKeycloakDeploymentPath, String fileKeycloakPvcPath, int id, String logsPath)
-			throws IOException {
+			throws IOException, InterruptedException {
 		Path path = Paths.get(logsPath + "/" + id + ".txt");
 		String installNginx = "kubectl apply -f "+fileKeycloakPvcPath;
 		ProcessBuilder builder = new ProcessBuilder();
 		builder.command("bash", "-c",installNginx);
 		Process process = builder.start();
+		System.out.println(installNginx);
 		Charset charset = StandardCharsets.UTF_8;
 		StringBuilder output = new StringBuilder();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -93,20 +101,39 @@ public class Utils {
 	}
 
 	// deploy keycloak pod
-	public static void deployKeycloakPod(String fileKeycloakDeploymentPath, String fileKeycloakPvcPath, int id, String logsPath) throws IOException {
-	String kubeApplyIngress = "kubectl apply -f " + fileKeycloakDeploymentPath;
-	ProcessBuilder builderFileKeycloakDep = new ProcessBuilder();
-	builderFileKeycloakDep.command("bash", "-c",kubeApplyIngress);
-	Process processFileKeycloakDep = builderFileKeycloakDep.start();
-	Charset charset = StandardCharsets.UTF_8;
-	Path path = Paths.get(logsPath + "/" + id + ".txt");
-	String line = "";
-	StringBuilder output = new StringBuilder();
-	BufferedReader readerFileKeycloakDep = new BufferedReader(new InputStreamReader(processFileKeycloakDep.getInputStream()));
-		while ((line = readerFileKeycloakDep.readLine()) != null) {
-		output.append(line + "\n");
-	}
-	Files.write(path, output.toString().getBytes(charset), StandardOpenOption.APPEND);
+	public static void deployKeycloakPod(String fileKeycloakDeploymentPath, String fileKeycloakPvcPath, int id,
+			String logsPath) throws IOException {
+
+		String kubectlgetPvc = "kubectl get pvc";
+		ProcessBuilder builderVerifyKubectlPvc = new ProcessBuilder();
+		builderVerifyKubectlPvc.command("bash", "-c", kubectlgetPvc);
+		Process processVerifyPvc = builderVerifyKubectlPvc.start();
+		Charset charset = StandardCharsets.UTF_8;
+		Path path = Paths.get(logsPath + "/" + id + ".txt");
+		String line = "";
+		StringBuilder output = new StringBuilder();
+		BufferedReader readerFileVerifyPvc = new BufferedReader(
+				new InputStreamReader(processVerifyPvc.getInputStream()));
+		while ((line = readerFileVerifyPvc.readLine()) != null) {
+			output.append(line + "\n");
+		}
+		if (output.toString().contains("Bound")) {
+
+			String kubeApplyIngress = "kubectl apply -f " + fileKeycloakDeploymentPath;
+			ProcessBuilder builderFileKeycloakDep = new ProcessBuilder();
+			builderFileKeycloakDep.command("bash", "-c", kubeApplyIngress);
+			Process processFileKeycloakDep = builderFileKeycloakDep.start();
+			line = "";
+			output = new StringBuilder();
+			BufferedReader readerFileKeycloakDep = new BufferedReader(
+					new InputStreamReader(processFileKeycloakDep.getInputStream()));
+			while ((line = readerFileKeycloakDep.readLine()) != null) {
+				output.append(line + "\n");
+			}
+			Files.write(path, output.toString().getBytes(charset), StandardOpenOption.APPEND);
+		} else {
+			deployKeycloakPod(fileKeycloakDeploymentPath, fileKeycloakPvcPath, id, logsPath);
+		}
 	}
 	
 	// change firewall settings 
@@ -129,13 +156,12 @@ public class Utils {
 	
 	//public static String getServiceIpAddress()
 	
-	public static void createSecretDocker(Cluster cluster,int taskid, String logsPath) throws IOException {
+	public static void createSecretDocker(Cluster cluster,int taskid, String logsPath) throws IOException, InterruptedException {
 		
-	String kubectlSecret="kubectl create secret docker-registry activeviam.jfrog.io --docker-server=https://activeviam.jfrog.io/activeviam --docker-username="+cluster.getDockerUserName()+" --docker-password="+cluster.getDockerPassword()+" --docker-email="+cluster.getDockerEmail();
-	ProcessBuilder builder = new ProcessBuilder();
+	String kubectlSecret="kubectl create secret docker-registry activeviam.jfrog.io --docker-server=https://activeviam-delivery-docker-internal.jfrog.io/v2 --docker-username="+cluster.getDockerUserName()+" --docker-password="+cluster.getDockerPassword()+" --docker-email="+cluster.getDockerEmail();
+ 	ProcessBuilder builder = new ProcessBuilder();
 	builder.command("bash", "-c",kubectlSecret);
 	Process process= builder.start();
-
 	Charset charset = StandardCharsets.UTF_8;
 	StringBuilder output = new StringBuilder();
 	BufferedReader reader = new BufferedReader(
@@ -151,6 +177,7 @@ public class Utils {
 	//Secret Creation
 	public static void applyKubeFiles(String generatedCreationKeycloakSecretFilePath ,int taskid, String logsPath) throws IOException {
 		String createKeycloakSecret="kubectl apply -f "+generatedCreationKeycloakSecretFilePath;
+		System.out.println(createKeycloakSecret);
 		ProcessBuilder builder = new ProcessBuilder();
 		builder.command("bash", "-c",createKeycloakSecret);
 		Process process= builder.start();
