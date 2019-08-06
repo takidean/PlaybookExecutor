@@ -67,8 +67,7 @@ public class Utils {
 	String kubeApplyIngress = "kubectl apply -f " + fileNginxPath;
 	ProcessBuilder builderFileNginx = new ProcessBuilder();
 	builderFileNginx.command("bash", "-c",kubeApplyIngress);
-	System.out.println(kubeApplyIngress);
-	Process processFileNginx = builderFileNginx.start();
+ 	Process processFileNginx = builderFileNginx.start();
  	Charset charset = StandardCharsets.UTF_8;
 	StringBuilder output = new StringBuilder();
 
@@ -88,8 +87,7 @@ public class Utils {
 		ProcessBuilder builder = new ProcessBuilder();
 		builder.command("bash", "-c",installNginx);
 		Process process = builder.start();
-		System.out.println(installNginx);
-		Charset charset = StandardCharsets.UTF_8;
+ 		Charset charset = StandardCharsets.UTF_8;
 		StringBuilder output = new StringBuilder();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 		String line = "";
@@ -102,7 +100,7 @@ public class Utils {
 
 	// deploy keycloak pod
 	public static void deployKeycloakPod(String fileKeycloakDeploymentPath, String fileKeycloakPvcPath, int id,
-			String logsPath) throws IOException {
+			String logsPath) throws IOException, InterruptedException {
 
 		String kubectlgetPvc = "kubectl get pvc";
 		ProcessBuilder builderVerifyKubectlPvc = new ProcessBuilder();
@@ -118,7 +116,7 @@ public class Utils {
 			output.append(line + "\n");
 		}
 		if (output.toString().contains("Bound")) {
-
+			Thread.sleep(30000, 0);
 			String kubeApplyIngress = "kubectl apply -f " + fileKeycloakDeploymentPath;
 			ProcessBuilder builderFileKeycloakDep = new ProcessBuilder();
 			builderFileKeycloakDep.command("bash", "-c", kubeApplyIngress);
@@ -138,8 +136,8 @@ public class Utils {
 	
 	// change firewall settings 
 	public static void changeFirewallIpAddress(Cluster cluster,int taskid, String logsPath) throws IOException {
-		String firewallConfig="az sql server firewall-rule create -g "+cluster.getAksName() +"  -s "+cluster.getDbServerName()+"  -n myrule --start-ip-address 1.2.3.4 --end-ip-address 5.6.7.8 --subscription "+cluster.getSubscriptionId();
-		ProcessBuilder builder = new ProcessBuilder();
+ 		String firewallConfig="az sql server firewall-rule create -g "+cluster.getAksName() +"  -s "+cluster.getDbServerName().toLowerCase()+"  -n myrule --start-ip-address 1.1.1.1 --end-ip-address 255.255.255.254 --subscription "+cluster.getSubscriptionId();
+ 		ProcessBuilder builder = new ProcessBuilder();
 		builder.command("bash", "-c",firewallConfig);
 		Process process= builder.start();
 		Charset charset = StandardCharsets.UTF_8;
@@ -148,7 +146,7 @@ public class Utils {
 				new InputStreamReader(process.getInputStream()));	
 		String line="";
 		while ((line = reader.readLine()) != null) {
-			output.append(line + "\n");
+ 			output.append(line + "\n");
 		}
 		Path path = Paths.get(logsPath + "/" + taskid + ".txt");
 		Files.write(path, output.toString().getBytes(charset),StandardOpenOption.APPEND);
@@ -158,8 +156,11 @@ public class Utils {
 	
 	public static void createSecretDocker(Cluster cluster,int taskid, String logsPath) throws IOException, InterruptedException {
 		
-	String kubectlSecret="kubectl create secret docker-registry activeviam.jfrog.io --docker-server=https://activeviam-delivery-docker-internal.jfrog.io/v2 --docker-username="+cluster.getDockerUserName()+" --docker-password="+cluster.getDockerPassword()+" --docker-email="+cluster.getDockerEmail();
- 	ProcessBuilder builder = new ProcessBuilder();
+	String kubectlSecret="kubectl create secret docker-registry activeviam.jfrog.io --docker-server=https://activeviam-delivery-docker-internal.jfrog.io/v2/ --docker-username="+cluster.getDockerUserName()+" --docker-password="+cluster.getDockerPassword()+" --docker-email="+cluster.getDockerEmail();
+System.out.println(kubectlSecret);
+	//kubectl create secret docker-registry activeviam.jfrog.io --docker-server=https://activeviam-delivery-docker-internal.jfrog.io/v2/ --docker-username=delivery-bot --docker-password=Xka62I8m1ZXg --docker-email=tsd.ext@activeviam.com
+    //kubectl create secret docker-registry activeviam.jfrog.io --docker-server=-docker-server=https://activeviam-delivery-docker-internal.jfrog.io/v2/ --docker-username=delivery-bot --docker-password=Xka62I8m1ZXg --docker-email=tsd.ext@activeviam.com
+	ProcessBuilder builder = new ProcessBuilder();
 	builder.command("bash", "-c",kubectlSecret);
 	Process process= builder.start();
 	Charset charset = StandardCharsets.UTF_8;
@@ -177,8 +178,7 @@ public class Utils {
 	//Secret Creation
 	public static void applyKubeFiles(String generatedCreationKeycloakSecretFilePath ,int taskid, String logsPath) throws IOException {
 		String createKeycloakSecret="kubectl apply -f "+generatedCreationKeycloakSecretFilePath;
-		System.out.println(createKeycloakSecret);
-		ProcessBuilder builder = new ProcessBuilder();
+ 		ProcessBuilder builder = new ProcessBuilder();
 		builder.command("bash", "-c",createKeycloakSecret);
 		Process process= builder.start();
 		Charset charset = StandardCharsets.UTF_8;

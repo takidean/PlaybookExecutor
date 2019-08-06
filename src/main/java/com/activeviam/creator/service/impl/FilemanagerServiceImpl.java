@@ -248,7 +248,7 @@ public class FilemanagerServiceImpl {
 		String content = new String(Files.readAllBytes(path), charset);
 		content = content.replaceAll(RESOURCE_GROUP_VALUE, cluster.getAksName());
 		content = content.replaceAll(DB_SERVER_NAME, cluster.getDbServerName());	
-		content = content.replaceAll(DB_NAME, cluster.getDbServerName());		
+		content = content.replaceAll(DB_NAME, cluster.getDbName());		
 		Files.write(path, content.getBytes(charset));
 		return content;
 	}
@@ -295,9 +295,7 @@ System.out.println(e.getMessage());
 	@Async("threadPoolTaskExecutor")
 	public void asyncPlayBookCreateRG(Cluster clusterComplete,String name) throws Exception  {
 		try {
-			System.out.println("asyncPlayBookCreateRG "+cluster.getAksName());
-	//		Cluster clusterComplete = Utils.createCompleteClusterInformations(cluster, dbAdminUsername, keycloakUser, dockerUserName, dockerEmail);
- 		ProcessBuilder builder = new ProcessBuilder("ansible-playbook", generatedCreationGroupFilePath);
+  		ProcessBuilder builder = new ProcessBuilder("ansible-playbook", generatedCreationGroupFilePath);
 		Process process;
 		  LocalDate date = LocalDate.now();
 		  DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
@@ -320,19 +318,24 @@ System.out.println(e.getMessage());
 			if (!resultCreationAKS.toString().contains("fatal")) {
 				String resultCreationAKSStandard = asyncPlayBookCreateAKS(id, generatedStandardFilePath, path);
 				if (!resultCreationAKSStandard.toString().contains("fatal")) {
-					Task taskToUpdate= taskService.findById(id);
-					taskToUpdate.setStatus(1);
-					taskService.save(taskToUpdate);
+
 					String resultCreationDBStandard = asyncPlayBookCreateAKS(id, generatedCreationdbserverFilePath, path);
 					if(!resultCreationDBStandard.toString().contains("fatal") || !resultCreationDBStandard.toString().contains("ERROR")) {
 						String resultCreationDB = asyncPlayBookCreateAKS(id, generatedCreationdbFilePath, path);
 					if(!resultCreationDB.contains("fatal")) {
+						Task taskToUpdate= taskService.findById(id);
 						taskToUpdate.setStatus(1);
 						taskService.save(taskToUpdate);
 						runDeploymentScripts(clusterComplete, id);
 					}
+					else {
+						Task taskToUpdate= taskService.findById(id);
+ 						taskToUpdate.setStatus(0);
+						taskService.save(taskToUpdate);
+					}
 					}else {
-						taskToUpdate.setStatus(0);
+						Task taskToUpdate= taskService.findById(id);
+ 						taskToUpdate.setStatus(0);
 						taskService.save(taskToUpdate);
 					}
 				} else {
@@ -384,8 +387,7 @@ System.out.println(e.getMessage());
 
 	Charset charset = StandardCharsets.UTF_8;
 	StringBuilder output = new StringBuilder();	
-System.out.println(login);
-	BufferedReader reader = new BufferedReader(
+ 	BufferedReader reader = new BufferedReader(
 			new InputStreamReader(process.getInputStream()));	
 	String line="";
 	while ((line = reader.readLine()) != null) {
@@ -395,8 +397,7 @@ System.out.println(login);
 	Files.write(path, output.toString().getBytes(charset),StandardOpenOption.APPEND);
 	
 	String mergeaks ="az aks get-credentials --resource-group " +cluster.getAksName()+ " --name " +cluster.getStandardAksName()+ " --subscription "+cluster.getSubscriptionId();
-	System.out.println(mergeaks);
-	ProcessBuilder builderMerge = new ProcessBuilder();
+ 	ProcessBuilder builderMerge = new ProcessBuilder();
 	builderMerge.command("bash", "-c",mergeaks);
 	Process processMerge= builderMerge.start();
 	BufferedReader readerMerge = new BufferedReader(
@@ -410,8 +411,7 @@ System.out.println(login);
 	
 	// start deploying
 	public void runDeploymentScripts(Cluster cluster,int taskid) throws IOException, InterruptedException {
-		System.out.println(cluster.getAksName()+" runDeploymentScripts"); 
-		connectUser(cluster,taskid);
+ 		 connectUser(cluster,taskid);
 		 Utils.applyKubeFiles(generatedCreationSecretDBFilePath, taskid, logsPath);
 		 Utils.applyKubeFiles(generatedCreationKeycloakSecretFilePath,taskid, logsPath);
 		 Utils.applyKubeFiles(storageClass, taskid, logsPath);
@@ -419,14 +419,11 @@ System.out.println(login);
 		 Utils.createSecretDocker(cluster, taskid,logsPath);
 		 Utils.createNginx(generatedCreationIngress, taskid, logsPath);
 		 Utils.applyNginxController(generatedCreationIngress, taskid, logsPath);
+		 Utils.deployKeycloak(generatedCreationKeycloak, keycloakCreationPvc, taskid, logsPath);
 		 Utils.changeFirewallIpAddress(cluster, taskid, logsPath);
  		 Utils.createDomaineNameTlsCert(certFilePath, keyFilePath, taskid, logsPath);
- 		
  		 Utils.helmInstall( taskid, logsPath);
-		 Utils.deployKeycloak(generatedCreationKeycloak, keycloakCreationPvc, taskid, logsPath);
 		 Utils.deployKeycloakPod(generatedCreationKeycloak, keycloakCreationPvc, taskid, logsPath);
-		 
-		
 	}
 	
 		
