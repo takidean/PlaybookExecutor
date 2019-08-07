@@ -1,0 +1,15 @@
+- name: Delete Azure Resource groupe
+  hosts: localhost
+  connection: local
+  vars:
+    location: westeurope
+    username: azureuser
+    ssh_key: ssh-rsa_value
+    client_id: client_id_value
+    client_secret: client_secret_value
+  tasks:
+    - name: Delete a resource group
+      azure_rm_resourcegroup:
+        name: resource_group_value
+        state: absent
+    

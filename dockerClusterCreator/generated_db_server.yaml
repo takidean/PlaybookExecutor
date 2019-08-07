@@ -1,0 +1,11 @@
+- name: Create (or update) SQL Server
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: Create SQL Server
+    azure_rm_sqlserver:
+     resource_group: testmardisixDev
+     name: dbserverstandardtestmardisixDev
+     location: westeurope
+     admin_username: delivery
+     admin_password: TessTe1!

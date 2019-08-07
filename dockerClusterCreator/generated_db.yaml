@@ -1,0 +1,10 @@
+- name: Create (or update) SQL DB
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: Create SQL Server
+    azure_rm_sqldatabase:
+     resource_group: testmardisixDev
+     server_name: dbserverstandardtestmardisixDev
+     name: dbstandardtestmardisixDev
+     location: westeurope

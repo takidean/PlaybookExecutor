@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+  labels:
+    name: keycloak
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+#    nodePort: 30181
+  - name: https
+    port: 8443
+    targetPort: 8180
+#    nodePort: 30182
+  selector:
+    name: keycloak
+#  type: LoadBalancer
