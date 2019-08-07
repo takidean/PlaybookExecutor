@@ -42,6 +42,49 @@
                 <p  class="form-control" >Vm size: ${cluster.vmSize}</p>
                 </div>
 
+             <!--    <div class="form-group ${status.error ? 'has-error' : ''}">
+                <p  class="form-control" >db server name: ${cluster.dbServerName}</p>
+                </div>
+ -->
+ <!-- 
+                <div class="form-group ${status.error ? 'has-error' : ''}">
+                <p  class="form-control" >db admin username: ${cluster.dbAdminUsername}</p>
+                </div>
+ 
+ 
+                <div class="form-group ${status.error ? 'has-error' : ''}">
+                <p  class="form-control" >db admin password: ${cluster.dbAdminPassword}</p>
+                </div>
+
+
+                <div class="form-group ${status.error ? 'has-error' : ''}">
+                <p  class="form-control" >db name: ${cluster.dbName}</p>
+                </div>
+
+                <div class="form-group ${status.error ? 'has-error' : ''}">
+                <p  class="form-control" >keycloak user: ${cluster.keycloakUser}</p>
+                </div>
+-->
+                <div class="form-group ${status.error ? 'has-error' : ''}">
+                <p  class="form-control" >keycloak password: ${cluster.keycloakPassword}</p>
+                </div>
+<!-- 
+                <div class="form-group ${status.error ? 'has-error' : ''}">
+                <p  class="form-control" >docker username: ${cluster.dockerUserName}</p>
+                </div>
+ -->
+                <div class="form-group ${status.error ? 'has-error' : ''}">
+                <p  class="form-control" >docker password: ${cluster.dockerPassword}</p>
+                </div>
+<!-- 
+                <div class="form-group ${status.error ? 'has-error' : ''}">
+                <p  class="form-control" >docker email: ${cluster.dockerEmail}</p>
+                </div>
+ -->
+                <div class="form-group ${status.error ? 'has-error' : ''}">
+                <p  class="form-control" >domain name: ${cluster.domainName}</p>
+                </div>
+
 
                 <div class="form-group ${status.error ? 'has-error' : ''}">
 				<p  class="form-control" >Tag: ${cluster.tag}</p>                </div>

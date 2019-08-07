@@ -2,9 +2,10 @@ package com.activeviam.creator.web;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.HtmlUtils;
 
 import com.activeviam.creator.model.Cluster;
@@ -28,6 +30,7 @@ import com.activeviam.creator.model.Refresh;
 import com.activeviam.creator.model.Task;
 import com.activeviam.creator.service.DeveloperService;
 import com.activeviam.creator.service.TaskService;
+import com.activeviam.creator.service.common.Utils;
 import com.activeviam.creator.service.impl.FilemanagerServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -36,7 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class UserController {
 	
 	private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
-//	
+	
    @Autowired
     private DeveloperService developerService;
 
@@ -47,8 +50,6 @@ public class UserController {
 
 	@Autowired
 	FilemanagerServiceImpl filemanagerServiceImpl;
-
-
 
     @GetMapping({"/home"})
     public String home(Model model,Principal principal) {
@@ -97,7 +98,7 @@ public class UserController {
     @GetMapping("/result")
     public String runCreation() {
 		try {
-		filemanagerServiceImpl.runPlayBook(filemanagerServiceImpl.getGeneratedFilePath());
+		filemanagerServiceImpl.runPlayBook(filemanagerServiceImpl.getGeneratedAKSFilePath());
 		} catch (IOException | InterruptedException e) {
 		return "fail";	
 		}
@@ -160,11 +161,11 @@ public class UserController {
 	}
   
     @PostMapping("/validation")
-	public String validateSubmit(@ModelAttribute("cluster") Cluster cluster, Principal principal) throws Exception {
+	public String validateSubmit( Principal principal) throws Exception {
 		if (developerService.validateDeveloper(principal.getName())) {
 			try {
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-				filemanagerServiceImpl.asyncPlayBookCreateRG(auth.getName());
+				filemanagerServiceImpl.asyncPlayBookCreateRG(filemanagerServiceImpl.getCluster(),auth.getName());
 			} catch (IOException | InterruptedException e) {
 				LOGGER.error("cannot run playBook", e);
 				throw new Exception("cannot run", e);
@@ -190,20 +191,17 @@ public class UserController {
   
     
     @PostMapping("/createcluster")
-    public String  startSubmit(@ModelAttribute("cluster") Cluster cluster,Principal principal)  {
+    public String  startSubmit(@ModelAttribute("cluster") Cluster cluster,Principal principal )  {
      	if(developerService.validateDeveloper(principal.getName())) {
     	try {
+    		
+            filemanagerServiceImpl.setCluster(cluster);
+            
     		filemanagerServiceImpl.replaceSubscriptionId(cluster.getSubscriptionId());
     		
-			fileGenerator(filemanagerServiceImpl.getGeneratedFilePath(), filemanagerServiceImpl.getTemplateFilePath());
-			filemanagerServiceImpl.replaceFileContent(Paths.get(filemanagerServiceImpl.getGeneratedFilePath()), cluster);
-	    	
-			fileGenerator(filemanagerServiceImpl.getGeneratedCreationGroupFilePath(), filemanagerServiceImpl.getTemplateCreationResourceGroupFilePath());
-			filemanagerServiceImpl.replaceResourceGroupCreationFileContent(Paths.get(filemanagerServiceImpl.getGeneratedCreationGroupFilePath()), cluster);
-
-			fileGenerator(filemanagerServiceImpl.getGeneratedStandardFilePath(), filemanagerServiceImpl.getTemplateStandardFilePath());
-			filemanagerServiceImpl.standardAksCreator(cluster);
-
+	 
+           filemanagerServiceImpl.setCluster(cluster);
+    		filemanagerServiceImpl.generateFiles(cluster);
 
     	} catch (IOException e) {
 			LOGGER.error("a problem with your file ", e);

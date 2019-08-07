@@ -1,4 +1,4 @@
-FROM alpine:3.9
+FROM alpine:edge
 
 MAINTAINER zoltan@mullner.hu
 
@@ -14,7 +14,7 @@ RUN echo "===> Installing sudo to emulate normal OS behavior..."  && \
     \
     \
     echo "===> Installing Ansible..."  && \
-    pip install ansible==2.7.9         && \
+    pip install ansible==2.8.2         && \
     \
     \
     echo "===> Installing handy tools (not absolutely required)..."  && \
@@ -49,6 +49,8 @@ RUN pip install --no-cache-dir --upgrade yq
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 RUN chmod +x ./kubectl
 RUN sudo mv ./kubectl /usr/local/bin/kubectl
+
+RUN pip install --upgrade pip
 RUN \
   apk update && \
   apk add bash py-pip && \
@@ -57,24 +59,53 @@ RUN \
   pip --no-cache-dir install azure-cli && \
 apk del --purge build
 
+RUN pip install -I azure-nspkg
+ENV BASE_URL="https://get.helm.sh"
+ENV TAR_FILE="helm-v2.13.0-linux-amd64.tar.gz"
+
+RUN apk add --update --no-cache curl ca-certificates && \
+    curl -L ${BASE_URL}/${TAR_FILE} |tar xvz && \
+    mv linux-amd64/helm /usr/bin/helm && \
+    chmod +x /usr/bin/helm && \
+    rm -rf linux-amd64 && \
+    apk del curl && \
+    rm -f /var/cache/apk/*
+
+ADD https://storage.googleapis.com/kubernetes-release/release/v1.10.11/bin/linux/amd64/kubectl /usr/local/bin/kubectl
+
+RUN set -x && \
+    apk add --no-cache curl ca-certificates && \
+    chmod +x /usr/local/bin/kubectl && \
+    \
+    # Basic check it works.
+    kubectl version --client
+
+RUN echo 'ipv6' >> /etc/modules
+RUN echo 'net.ipv6.conf.all.disable_ipv6 = 1' >> /etc/sysctl.d/01-disable-ipv6.conf
 RUN pip install --no-cache-dir --upgrade azure-cli
+RUN pip install ansible[azure]
 RUN mkdir /opt/builder/
 RUN mkdir /root/.azure
+RUN mkdir /opt/builder/logs/
 COPY credentials /root/.azure
 COPY template_resource_create.yaml /opt/builder/template_resource_create.yaml
 COPY template_standard_cluster.yaml /opt/builder/template_standard_cluster.yaml
 COPY template_cluster_tocreate.yaml /opt/builder/template_cluster_tocreate.yaml
 COPY clusterCreator.war /opt/builder/clusterCreator.war
 COPY external.properties /opt/builder/external.properties
+COPY /opt/builder/tls.key /opt/builder/tls.key
+COPY /opt/builder/tls.crt /opt/builder/tls.crt
+
 RUN chmod +wx /opt/builder/clusterCreator.war
 RUN apk update
 RUN apk fetch openjdk8
 RUN apk add openjdk8
-
+RUN pip install --no-cache-dir --upgrade azure-cli
+RUN ssh-keygen  -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""
 RUN mkdir -p /ansible/playbooks
 
-WORKDIR /ansible/playbooks
+
+
 
 VOLUME [ "/ansible/playbooks" ]
 ENTRYPOINT ["java","-jar","/opt/builder/clusterCreator.war"]
-# default command: display Ansible version
