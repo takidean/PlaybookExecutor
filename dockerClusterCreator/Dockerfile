@@ -45,6 +45,11 @@ RUN apk --no-cache --update add \
         curl
 
 RUN pip install --no-cache-dir --upgrade yq
+
+RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+RUN chmod +x ./kubectl
+RUN sudo mv ./kubectl /usr/local/bin/kubectl
+
 RUN pip install --upgrade pip
 RUN \
   apk update && \
@@ -110,10 +115,8 @@ RUN pip install --no-cache-dir --upgrade azure-cli
 RUN ssh-keygen  -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""
 RUN mkdir -p /ansible/playbooks
 
-#az login --service-principal --username "a084bea2-4c58-486f-a9a1-631af5454943" --password "4/lpor8MU*pnxjJGkyt+LWM-#VtC9w9Sr" --tenant "749303d0-d192-4c55-99f4-66679552732c"
 
 
 
 VOLUME [ "/ansible/playbooks" ]
 ENTRYPOINT ["java","-jar","/opt/builder/clusterCreator.war"]
-# default command: display Ansible version
