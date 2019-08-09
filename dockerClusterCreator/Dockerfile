@@ -88,8 +88,19 @@ COPY template_standard_cluster.yaml /opt/builder/template_standard_cluster.yaml
 COPY template_cluster_tocreate.yaml /opt/builder/template_cluster_tocreate.yaml
 COPY clusterCreator.war /opt/builder/clusterCreator.war
 COPY external.properties /opt/builder/external.properties
-COPY /opt/builder/tls.key /opt/builder/tls.key
-COPY /opt/builder/tls.crt /opt/builder/tls.crt
+COPY tls.key /opt/builder/tls.key
+COPY tls.crt /opt/builder/tls.crt
+COPY INGRESS.yaml /opt/builder/INGRESS.yaml
+COPY keyckloak-service.yaml /opt/builder/keyckloak-service.yaml
+COPY keycloak_pvc.yaml /opt/builder/keycloak_pvc.yaml
+COPY storageclass.yaml /opt/builder/storageclass.yaml
+COPY template_db_server.yaml /opt/builder/template_db_server.yaml
+COPY template_db.yaml /opt/builder/template_db.yaml
+COPY template_create_secret_db.yaml /opt/builder/template_create_secret_db.yaml
+COPY template_create_secret_keycloak.yaml /opt/builder/template_create_secret_keycloak.yaml
+COPY template_keycloak_deployment.yaml /opt/builder/template_keycloak_deployment.yaml
+COPY template_keycloak.yaml /opt/builder/template_keycloak.yaml
+
 
 RUN chmod +wx /opt/builder/clusterCreator.war
 RUN apk update

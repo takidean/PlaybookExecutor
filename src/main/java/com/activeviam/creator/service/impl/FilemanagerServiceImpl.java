@@ -8,7 +8,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -270,8 +269,8 @@ public class FilemanagerServiceImpl {
 	}
 
 	// keycloak file generator
-	public String replaceKeycloakDeploymentFileContent(Cluster cluster)  {
-		try {
+	public String replaceKeycloakDeploymentFileContent(Cluster cluster) throws IOException  {
+		 
 		Charset charset = StandardCharsets.UTF_8;
 		Path path=Paths.get(generatedCreationkeycloakFilePath);
 		String content = new String(Files.readAllBytes(path), charset);
@@ -287,9 +286,7 @@ public class FilemanagerServiceImpl {
 			
 		 content = new String(Files.readAllBytes(path), charset);
 		 return content;
-		} catch (IOException e) {
-System.out.println(e.getMessage());
-			return "****";		}
+	 
 	}
 	
 	@Async("threadPoolTaskExecutor")
@@ -714,12 +711,6 @@ System.out.println(e.getMessage());
 		fileGenerator(getGeneratedCreationIngress(), getTemplateCreationIngress());
 		createIngress(completeCluster);
 
-		// keycloak  
-//		fileGenerator(getGeneratedCreationKeycloak(), getTemplateCreationKeycloak());
-//		createKeycloak(completeCluster);
-
-		
-		
 	}
 
 

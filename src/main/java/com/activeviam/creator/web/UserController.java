@@ -4,9 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +19,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.HtmlUtils;
 
 import com.activeviam.creator.model.Cluster;
@@ -30,7 +26,6 @@ import com.activeviam.creator.model.Refresh;
 import com.activeviam.creator.model.Task;
 import com.activeviam.creator.service.DeveloperService;
 import com.activeviam.creator.service.TaskService;
-import com.activeviam.creator.service.common.Utils;
 import com.activeviam.creator.service.impl.FilemanagerServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -111,7 +106,6 @@ public class UserController {
 		if (developerService.validateDeveloper(principal.getName())) {
 			ArrayList<Task> tsls = new ArrayList<Task>();
 			tsls.addAll(taskService.findTaskStatusByLocalDate());
-
 			ObjectMapper mapper = new ObjectMapper();
 			String json = "";
 			try {
@@ -193,17 +187,11 @@ public class UserController {
     @PostMapping("/createcluster")
     public String  startSubmit(@ModelAttribute("cluster") Cluster cluster,Principal principal )  {
      	if(developerService.validateDeveloper(principal.getName())) {
-    	try {
-    		
-            filemanagerServiceImpl.setCluster(cluster);
-            
-    		filemanagerServiceImpl.replaceSubscriptionId(cluster.getSubscriptionId());
-    		
-	 
-           filemanagerServiceImpl.setCluster(cluster);
-    		filemanagerServiceImpl.generateFiles(cluster);
-
-    	} catch (IOException e) {
+			try {
+				filemanagerServiceImpl.replaceSubscriptionId(cluster.getSubscriptionId());
+				filemanagerServiceImpl.setCluster(cluster);
+				filemanagerServiceImpl.generateFiles(cluster);
+			} catch (IOException e) {
 			LOGGER.error("a problem with your file ", e);
  		}
         return "validation";

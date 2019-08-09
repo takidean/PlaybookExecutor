@@ -18,84 +18,33 @@ import com.activeviam.creator.model.Cluster;
 public class Utils {
 
 	public static void createNginx(String fileNginxPath, int id, String logsPath) throws IOException {
-		Path path = Paths.get(logsPath + "/" + id + ".txt");
 		String installInit = "helm init";
-
-		ProcessBuilder builder = new ProcessBuilder();
-		builder.command("bash", "-c",installInit);
-		Process process = builder.start();
-		Charset charset = StandardCharsets.UTF_8;
-		StringBuilder output = new StringBuilder();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-		String line = "";
-		while ((line = reader.readLine()) != null) {
-			output.append(line + "\n");
-		}
-		Files.write(path, output.toString().getBytes(charset), StandardOpenOption.APPEND);	
+		runCommand(installInit, id, logsPath);
 	}
-	
-	//install Helm
-	public static void helmInstall( int id, String logsPath) throws IOException, InterruptedException {
-		String installNginx ="helm install --name ngin-ingress stable/nginx-ingress";
-		Path path = Paths.get(logsPath + "/" + id + ".txt");
 
-		ProcessBuilder builderFileNginx = new ProcessBuilder();
-		builderFileNginx.command("bash", "-c",installNginx);
-		Process processFileNginx = builderFileNginx.start();
+	// install Helm
+	public static void helmInstall(int id, String logsPath) throws IOException, InterruptedException {
+		String installNginx = "helm install --name ngin-ingress stable/nginx-ingress";
 
-		Charset charset = StandardCharsets.UTF_8;
-		StringBuilder output = new StringBuilder();
-		BufferedReader readerFileNginx = new BufferedReader(new InputStreamReader(processFileNginx.getInputStream()));
-		String line = "";
-		while ((line = readerFileNginx.readLine()) != null) {
-			output.append(line + "\n");
-		
-		}
-		
-		if(!output.toString().contains("DEPLOYED")) {
-		Thread.sleep(5000, 0);
+		StringBuilder output = runCommand(installNginx, id, logsPath);
+		if (!output.toString().contains("DEPLOYED")) {
+			Thread.sleep(5000, 0);
 			helmInstall(id, logsPath);
 		}
-		Files.write(path, output.toString().getBytes(charset), StandardOpenOption.APPEND);
-	}
-	
-	//Helm apply nginx controller
-	
-	public static void applyNginxController(String fileNginxPath, int id, String logsPath) throws IOException, InterruptedException {
-	Path path = Paths.get(logsPath + "/" + id + ".txt");
-
-	String kubeApplyIngress = "kubectl apply -f " + fileNginxPath;
-	ProcessBuilder builderFileNginx = new ProcessBuilder();
-	builderFileNginx.command("bash", "-c",kubeApplyIngress);
- 	Process processFileNginx = builderFileNginx.start();
- 	Charset charset = StandardCharsets.UTF_8;
-	StringBuilder output = new StringBuilder();
-
-	BufferedReader readerFileNginx = new BufferedReader(new InputStreamReader(processFileNginx.getInputStream()));
-	String line = "";
-	while ((line = readerFileNginx.readLine()) != null) {
-		output.append(line + "\n");
-	}
-	Files.write(path, output.toString().getBytes(charset), StandardOpenOption.APPEND);
 	}
 
-	
-	public static void deployKeycloak(String fileKeycloakDeploymentPath, String fileKeycloakPvcPath, int id, String logsPath)
+	// Helm apply nginx controller
+
+	public static void applyNginxController(String fileNginxPath, int id, String logsPath)
 			throws IOException, InterruptedException {
-		Path path = Paths.get(logsPath + "/" + id + ".txt");
-		String installNginx = "kubectl apply -f "+fileKeycloakPvcPath;
-		ProcessBuilder builder = new ProcessBuilder();
-		builder.command("bash", "-c",installNginx);
-		Process process = builder.start();
- 		Charset charset = StandardCharsets.UTF_8;
-		StringBuilder output = new StringBuilder();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-		String line = "";
-		while ((line = reader.readLine()) != null) {
-			output.append(line + "\n");
-		}
-		Files.write(path, output.toString().getBytes(charset), StandardOpenOption.APPEND);
-		if (!output.toString().contains("Error")) {}
+		String kubeApplyIngress = "kubectl apply -f " + fileNginxPath;
+		runCommand(kubeApplyIngress, id, logsPath);
+	}
+
+	public static void deployKeycloak(String fileKeycloakDeploymentPath, String fileKeycloakPvcPath, int id,
+			String logsPath) throws IOException, InterruptedException {
+		String installNginx = "kubectl apply -f " + fileKeycloakPvcPath;
+		runCommand(installNginx, id, logsPath);
 	}
 
 	// deploy keycloak pod
@@ -106,8 +55,6 @@ public class Utils {
 		ProcessBuilder builderVerifyKubectlPvc = new ProcessBuilder();
 		builderVerifyKubectlPvc.command("bash", "-c", kubectlgetPvc);
 		Process processVerifyPvc = builderVerifyKubectlPvc.start();
-		Charset charset = StandardCharsets.UTF_8;
-		Path path = Paths.get(logsPath + "/" + id + ".txt");
 		String line = "";
 		StringBuilder output = new StringBuilder();
 		BufferedReader readerFileVerifyPvc = new BufferedReader(
@@ -118,126 +65,86 @@ public class Utils {
 		if (output.toString().contains("Bound")) {
 			Thread.sleep(30000, 0);
 			String kubeApplyIngress = "kubectl apply -f " + fileKeycloakDeploymentPath;
-			ProcessBuilder builderFileKeycloakDep = new ProcessBuilder();
-			builderFileKeycloakDep.command("bash", "-c", kubeApplyIngress);
-			Process processFileKeycloakDep = builderFileKeycloakDep.start();
-			line = "";
-			output = new StringBuilder();
-			BufferedReader readerFileKeycloakDep = new BufferedReader(
-					new InputStreamReader(processFileKeycloakDep.getInputStream()));
-			while ((line = readerFileKeycloakDep.readLine()) != null) {
-				output.append(line + "\n");
-			}
-			Files.write(path, output.toString().getBytes(charset), StandardOpenOption.APPEND);
+			runCommand(kubeApplyIngress, id, logsPath);
 		} else {
 			deployKeycloakPod(fileKeycloakDeploymentPath, fileKeycloakPvcPath, id, logsPath);
 		}
 	}
-	
-	// change firewall settings 
-	public static void changeFirewallIpAddress(Cluster cluster,int taskid, String logsPath) throws IOException {
- 		String firewallConfig="az sql server firewall-rule create -g "+cluster.getAksName() +"  -s "+cluster.getDbServerName().toLowerCase()+"  -n myrule --start-ip-address 1.1.1.1 --end-ip-address 255.255.255.254 --subscription "+cluster.getSubscriptionId();
- 		ProcessBuilder builder = new ProcessBuilder();
-		builder.command("bash", "-c",firewallConfig);
-		Process process= builder.start();
-		Charset charset = StandardCharsets.UTF_8;
-		StringBuilder output = new StringBuilder();
-		BufferedReader reader = new BufferedReader(
-				new InputStreamReader(process.getInputStream()));	
-		String line="";
-		while ((line = reader.readLine()) != null) {
- 			output.append(line + "\n");
-		}
-		Path path = Paths.get(logsPath + "/" + taskid + ".txt");
-		Files.write(path, output.toString().getBytes(charset),StandardOpenOption.APPEND);
-	}
-	
-	//public static String getServiceIpAddress()
-	
-	public static void createSecretDocker(Cluster cluster,int taskid, String logsPath) throws IOException, InterruptedException {
-		
-	String kubectlSecret="kubectl create secret docker-registry activeviam.jfrog.io --docker-server=https://activeviam-delivery-docker-internal.jfrog.io/v2/ --docker-username="+cluster.getDockerUserName()+" --docker-password="+cluster.getDockerPassword()+" --docker-email="+cluster.getDockerEmail();
-System.out.println(kubectlSecret);
-	//kubectl create secret docker-registry activeviam.jfrog.io --docker-server=https://activeviam-delivery-docker-internal.jfrog.io/v2/ --docker-username=delivery-bot --docker-password=Xka62I8m1ZXg --docker-email=tsd.ext@activeviam.com
-    //kubectl create secret docker-registry activeviam.jfrog.io --docker-server=-docker-server=https://activeviam-delivery-docker-internal.jfrog.io/v2/ --docker-username=delivery-bot --docker-password=Xka62I8m1ZXg --docker-email=tsd.ext@activeviam.com
-	ProcessBuilder builder = new ProcessBuilder();
-	builder.command("bash", "-c",kubectlSecret);
-	Process process= builder.start();
-	Charset charset = StandardCharsets.UTF_8;
-	StringBuilder output = new StringBuilder();
-	BufferedReader reader = new BufferedReader(
-			new InputStreamReader(process.getInputStream()));	
-	String line="";
-	while ((line = reader.readLine()) != null) {
-		output.append(line + "\n");
-	}
-	Path path = Paths.get(logsPath + "/" + taskid + ".txt");
-	Files.write(path, output.toString().getBytes(charset),StandardOpenOption.APPEND);
-	}
-	
-	//Secret Creation
-	public static void applyKubeFiles(String generatedCreationKeycloakSecretFilePath ,int taskid, String logsPath) throws IOException {
-		String createKeycloakSecret="kubectl apply -f "+generatedCreationKeycloakSecretFilePath;
- 		ProcessBuilder builder = new ProcessBuilder();
-		builder.command("bash", "-c",createKeycloakSecret);
-		Process process= builder.start();
-		Charset charset = StandardCharsets.UTF_8;
-		StringBuilder output = new StringBuilder();
-		BufferedReader reader = new BufferedReader(
-				new InputStreamReader(process.getInputStream()));	
-		String line="";
-		while ((line = reader.readLine()) != null) {
-			output.append(line + "\n");
-		}
-		Path path = Paths.get(logsPath + "/" + taskid + ".txt");
-		Files.write(path, output.toString().getBytes(charset),StandardOpenOption.APPEND);	
 
+	// change firewall settings
+	public static void changeFirewallIpAddress(Cluster cluster, int taskid, String logsPath) throws IOException {
+		String firewallConfig = "az sql server firewall-rule create -g " + cluster.getAksName() + "  -s "
+				+ cluster.getDbServerName().toLowerCase()
+				+ "  -n myrule --start-ip-address 1.1.1.1 --end-ip-address 255.255.255.254 --subscription "
+				+ cluster.getSubscriptionId();
+		runCommand(firewallConfig, taskid, logsPath);
 	}
-	
 
-	
-	public static void createDomaineNameTlsCert(String certFilePath,String keyFilePath,int taskid, String logsPath) throws IOException {
-		String createCertificate=	"kubectl create secret tls active-tls-cert --key "+keyFilePath+" --cert "+certFilePath;
-		ProcessBuilder builder = new ProcessBuilder();
-		builder.command("bash", "-c",createCertificate);
-		Process process= builder.start();
-		Charset charset = StandardCharsets.UTF_8;
-		StringBuilder output = new StringBuilder();
-		BufferedReader reader = new BufferedReader(
-				new InputStreamReader(process.getInputStream()));	
-		String line="";
-		while ((line = reader.readLine()) != null) {
-			output.append(line + "\n");
-		}
-		Path path = Paths.get(logsPath + "/" + taskid + ".txt");
-		Files.write(path, output.toString().getBytes(charset),StandardOpenOption.APPEND);	
+	public static void createSecretDocker(Cluster cluster, int taskid, String logsPath)
+			throws IOException, InterruptedException {
+
+		String kubectlSecret = "kubectl create secret docker-registry activeviam.jfrog.io --docker-server=https://activeviam-delivery-docker-internal.jfrog.io/v2/ --docker-username="
+				+ cluster.getDockerUserName() + " --docker-password=" + cluster.getDockerPassword() + " --docker-email="
+				+ cluster.getDockerEmail();
+		runCommand(kubectlSecret, taskid, logsPath);
 	}
-	
+
+	// Secret Creation
+	public static void applyKubeFiles(String generatedCreationKeycloakSecretFilePath, int taskid, String logsPath)
+			throws IOException {
+		String createKeycloakSecret = "kubectl apply -f " + generatedCreationKeycloakSecretFilePath;
+		runCommand(createKeycloakSecret, taskid, logsPath);
+	}
+
+	public static void createDomaineNameTlsCert(String certFilePath, String keyFilePath, int taskid, String logsPath)
+			throws IOException {
+		String createCertificate = "kubectl create secret tls active-tls-cert --key " + keyFilePath + " --cert "
+				+ certFilePath;
+		runCommand(createCertificate, taskid, logsPath);
+	}
+
 	// Create cluster
-	public static Cluster createCompleteClusterInformations(Cluster cluster, String dbAdminUsername,String keycloakUser, String dockerUserName,String dockerEmail) {
+	public static Cluster createCompleteClusterInformations(Cluster cluster, String dbAdminUsername,
+			String keycloakUser, String dockerUserName, String dockerEmail) {
 		Cluster clusterComplete = new Cluster();
-		clusterComplete.setAksName(cluster.getAksName()+cluster.getTag());
+		clusterComplete.setAksName(cluster.getAksName() + cluster.getTag());
 		clusterComplete.setSubscriptionId(cluster.getSubscriptionId());
-		String standardAksName="standard"+cluster.getAksName()+cluster.getTag();
+		String standardAksName = "standard" + cluster.getAksName() + cluster.getTag();
 		clusterComplete.setStandardAksName(standardAksName);
 		clusterComplete.setDomainName(cluster.getDomainName());
 		clusterComplete.setVmSize(cluster.getVmSize());
 		clusterComplete.setDbAdminPassword(cluster.getDbAdminPassword());
-		clusterComplete.setKeycloakPassword(cluster.getKeycloakPassword()); 
-		clusterComplete.setDockerPassword(cluster.getDockerPassword()); 
-		clusterComplete.setDbServerName("dbserver"+standardAksName);
-		clusterComplete.setDbName("db"+standardAksName);
+		clusterComplete.setKeycloakPassword(cluster.getKeycloakPassword());
+		clusterComplete.setDockerPassword(cluster.getDockerPassword());
+		clusterComplete.setDbServerName("dbserver" + standardAksName);
+		clusterComplete.setDbName("db" + standardAksName);
 		clusterComplete.setTag(cluster.getTag());
 		clusterComplete.setDbAdminUsername(dbAdminUsername);
 		clusterComplete.setKeycloakUser(keycloakUser);
 		clusterComplete.setDockerUserName(dockerUserName);
 		clusterComplete.setDockerEmail(dockerEmail);
-		
+
 		return clusterComplete;
 	}
-	
-    public static void fileGenerator(String filePath,String templatefile) throws IOException {
-    	File copied = new File(filePath);
+
+	public static void fileGenerator(String filePath, String templatefile) throws IOException {
+		File copied = new File(filePath);
 		FileUtils.copyFile(new File(templatefile), copied);
-    }
+	}
+
+	public static StringBuilder runCommand(String command, int taskid, String logsPath) throws IOException {
+		ProcessBuilder builder = new ProcessBuilder();
+		builder.command("bash", "-c", command);
+		Process process = builder.start();
+		Charset charset = StandardCharsets.UTF_8;
+		StringBuilder output = new StringBuilder();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		String line = "";
+		while ((line = reader.readLine()) != null) {
+			output.append(line + "\n");
+		}
+		Path path = Paths.get(logsPath + "/" + taskid + ".txt");
+		Files.write(path, output.toString().getBytes(charset), StandardOpenOption.APPEND);
+		return output;
+	}
 }
