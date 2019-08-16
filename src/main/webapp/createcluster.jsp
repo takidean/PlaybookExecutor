@@ -55,31 +55,7 @@
 					</form:select>
 				</div>
 			</spring:bind>
-
-  <!--          <spring:bind path="dbServerName">
-                <div class="form-group ${status.error ? 'has-error' : ''}">
-                    <form:input type="text" path="dbServerName" class="form-control" placeholder="dbServerName"
-                                autofocus="true"></form:input>
-                </div>
-            </spring:bind>
-
-            <spring:bind path="dbName">
-                <div class="form-group ${status.error ? 'has-error' : ''}">
-                    <form:input type="text" path="dbName" class="form-control" placeholder="dbName"
-                                autofocus="true"></form:input>
-                </div>
-            </spring:bind>
- --> 
- 
- <!-- 
-            <spring:bind path="dbAdminUsername">
-                <div class="form-group ${status.error ? 'has-error' : ''}">
-                    <form:input type="text" path="dbAdminUsername" class="form-control" placeholder="dbAdminUsername"
-                                autofocus="true"></form:input>
-                </div>
-            </spring:bind>
- -->
- 
+  
             <spring:bind path="dbAdminPassword">
                 <div class="form-group ${status.error ? 'has-error' : ''}">
                     <form:input type="text" path="dbAdminPassword" class="form-control" placeholder="dbAdminPassword"
@@ -102,28 +78,12 @@
 				</div>
 			</spring:bind>
 
- <!--            <spring:bind path="dockerUserName">
-                <div class="form-group ${status.error ? 'has-error' : ''}">
-                    <form:input type="text" path="dockerUserName" class="form-control" placeholder="dockerUserName"
-                                autofocus="true"></form:input>
-                </div>
-            </spring:bind>
-
- -->
 			<spring:bind path="dockerPassword">
 				<div class="form-group ${status.error ? 'has-error' : ''}">
 					<form:input type="text" path="dockerPassword" class="form-control"
 						placeholder="dockerPassword" autofocus="true"></form:input>
 				</div>
 			</spring:bind>
-<!-- 
-			<spring:bind path="dockerEmail">
-				<div class="form-group ${status.error ? 'has-error' : ''}">
-					<form:input type="text" path="dockerEmail" class="form-control"
-						placeholder="dockerEmail" autofocus="true"></form:input>
-				</div>
-			</spring:bind>
- -->
 
 			<spring:bind path="domainName">
                 <div class="form-group ${status.error ? 'has-error' : ''}">
@@ -132,14 +92,19 @@
                 </div>
             </spring:bind>
 
-
-          <!--   <spring:bind path="tag">
+            <spring:bind path="githubRepository">
                 <div class="form-group ${status.error ? 'has-error' : ''}">
-                    <form:input type="text" path="tag" class="form-control" placeholder="tag"
+                    <form:input type="text" path="githubRepository" class="form-control" placeholder="githubRepository"
                                 autofocus="true"></form:input>
                 </div>
             </spring:bind>
- -->
+            <spring:bind path="githubBranch">
+                <div class="form-group ${status.error ? 'has-error' : ''}">
+                    <form:input type="text" path="githubBranch" class="form-control" placeholder="githubBranch"
+                                autofocus="true"></form:input>
+                </div>
+            </spring:bind>
+            
 			<spring:bind path="tag">
 				<div class="form-group">
 					<form:select path="tag" class="form-control">
@@ -149,15 +114,6 @@
 					</form:select>
 				</div>
 			</spring:bind>
-<!-- 			
-			<div class="form-group">
-				key:<input type="file" name="key" class="form-control" />
-			</div>
-			<div class="form-group">
-				ssl_certificate:<input type="file" name=" ssl_certificate"
-					class="form-control" />
-			</div>
- -->
 			<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
 			<button id="btnValidate"  class="btn btn-lg btn-primary btn-block" style="margin-top:20px">Submit</button>
@@ -171,23 +127,5 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
   <script src="/resources/js/bootstrap.min.js"></script>
   
- <!-- 
-        <script language="javascript">
-        $(document).ready(function () {
-            $("#btnDisable").on("click", function () {
-                $("#divContainer").find("input, button, submit, textarea, select").attr("disabled", "disabled");
-                
-                $("#btnValidate").removeAttr("disabled");  
-                $('#btnValidate').show();
-                $("#btnDisable").hide();
-                
-            });
-            $("#btnEnable").on("click", function () {
-                $("#divContainer").find("input, button, submit, textarea, select").removeAttr("disabled");
-                $("#divContainer").find("a").removeClass("disablehyper").unbind("click");
-            });
-        });
-    </script>
-   --> 
 </body>
 </html>

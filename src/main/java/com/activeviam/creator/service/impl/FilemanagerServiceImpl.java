@@ -63,7 +63,8 @@ public class FilemanagerServiceImpl {
 	private String KEYCLOAK_USERNAME_SECRET="value_username_keycloak";
 	private String KEYCLOAK_USERNAME_PASSWORD="value_password_keycloak";
 	private String DOMAIN_VALUE_NAME="domain_name_value";
-	
+	private String GITHUB_REPO="github_repo";
+	private String BRANCHE="branche";
 	@Autowired
 	TaskService taskService;
 	
@@ -173,29 +174,28 @@ public class FilemanagerServiceImpl {
 	@Value("${keycloakservice.generatedfile.path}")
 	String fileKeycloakServicePath;
 	
-	Cluster cluster;
-	
-	public String getTemplateCreationIngress() {
-		return templateCreationIngress;
-	}
-
-	public void setTemplateCreationIngress(String templateCreationIngress) {
-		this.templateCreationIngress = templateCreationIngress;
-	}
-
-	public String getGeneratedCreationIngress() {
-		return generatedCreationIngress;
-	}
-
-	public void setGeneratedCreationIngress(String generatedCreationIngress) {
-		this.generatedCreationIngress = generatedCreationIngress;
-	}
-
 	@Value("${logs.path}")
 	String logsPath;
-	
-	
 
+	@Value("${config.xml.path}")
+	String configFile;
+
+	@Value("${generated.config.xml.path}")
+	String generatedConfigFile;
+	
+	Cluster cluster;
+	
+	
+	
+	public String replaceGithubBranch( Cluster cluster) throws IOException {
+		Charset charset = StandardCharsets.UTF_8;
+		Path path=Paths.get(generatedConfigFile);
+		String content = new String(Files.readAllBytes(path), charset);
+		content = content.replaceAll(GITHUB_REPO, cluster.getGithubRepository());
+		content = content.replaceAll(BRANCHE, cluster.getGithubBranch());
+		Files.write(path, content.getBytes(charset));
+		return content;
+	}
 	
 	public String replaceFileContent(Path path, Cluster cluster) throws IOException {
 				
@@ -421,6 +421,7 @@ public class FilemanagerServiceImpl {
  		 Utils.createDomaineNameTlsCert(certFilePath, keyFilePath, taskid, logsPath);
  		 Utils.helmInstall( taskid, logsPath);
 		 Utils.deployKeycloakPod(generatedCreationKeycloak, keycloakCreationPvc, taskid, logsPath);
+	Utils.connectJenkins(configFilePath, githubUser, githubToken, aksName);
 	}
 	
 		
@@ -663,6 +664,24 @@ public class FilemanagerServiceImpl {
 		this.generatedCreationKeycloak = generatedCreationKeycloak;
 	}
 
+	public String getTemplateCreationIngress() {
+		return templateCreationIngress;
+	}
+
+	public void setTemplateCreationIngress(String templateCreationIngress) {
+		this.templateCreationIngress = templateCreationIngress;
+	}
+
+	public String getGeneratedCreationIngress() {
+		return generatedCreationIngress;
+	}
+
+	public void setGeneratedCreationIngress(String generatedCreationIngress) {
+		this.generatedCreationIngress = generatedCreationIngress;
+	}
+
+
+	
 	public Cluster getCluster() {
 		return cluster;
 	}
@@ -704,13 +723,16 @@ public class FilemanagerServiceImpl {
 		fileGenerator(getGeneratedCreationkeycloakSecretFilePath(), getTemplateCreationkeycloakSecretFilePath());
 		createSecretKeycloak(completeCluster);
 		// db secret
-		fileGenerator(getGeneratedCreationSecretDBFilePath(), getTemplateCreationSecretDBFilePath());
+		fileGenerator(generatedCreationSecretDBFilePath, templateCreationSecretDBFilePath);
 		createSecretDB(completeCluster);
 
 		// INGRESS  
 		fileGenerator(getGeneratedCreationIngress(), getTemplateCreationIngress());
 		createIngress(completeCluster);
 
+		// github jenkins config file
+		fileGenerator(generatedConfigFile , configFile);
+		replaceGithubBranch(cluster);
 	}
 
 

@@ -18,7 +18,8 @@ public class Cluster {
 	private String dockerEmail;
 	private String domainName;
 	private String standardAksName;
-	
+	private String githubRepository;
+	private String githubBranch;
 	//
 	
 	public String getAksName() {
@@ -130,6 +131,17 @@ public class Cluster {
 		this.standardAksName = standardAksName;
 	}
 	
-	
+	public String getGithubRepository() {
+		return githubRepository;
+	}
+	public void setGithubRepository(String githubrepository) {
+		this.githubRepository = githubrepository;
+	}
+	public String getGithubBranch() {
+		return githubBranch;
+	}
+	public void setGithubBranch(String githubBranch) {
+		this.githubBranch = githubBranch;
+	}
 
 }

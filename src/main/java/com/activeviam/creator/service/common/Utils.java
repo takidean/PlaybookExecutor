@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -14,6 +16,7 @@ import java.nio.file.StandardOpenOption;
 import org.apache.commons.io.FileUtils;
 
 import com.activeviam.creator.model.Cluster;
+import com.offbytwo.jenkins.JenkinsServer;
 
 public class Utils {
 
@@ -49,8 +52,7 @@ public class Utils {
 
 	// deploy keycloak pod
 	public static void deployKeycloakPod(String fileKeycloakDeploymentPath, String fileKeycloakPvcPath, int id,
-			String logsPath) throws IOException, InterruptedException {
-
+		String logsPath) throws IOException, InterruptedException {
 		String kubectlgetPvc = "kubectl get pvc";
 		ProcessBuilder builderVerifyKubectlPvc = new ProcessBuilder();
 		builderVerifyKubectlPvc.command("bash", "-c", kubectlgetPvc);
@@ -103,6 +105,12 @@ public class Utils {
 		runCommand(createCertificate, taskid, logsPath);
 	}
 
+	public static void connectJenkins(String configFilePath,String githubUser, String githubToken,String aksName) throws URISyntaxException, IOException {
+		
+		JenkinsServer jenkins = new JenkinsServer(new URI("https://retailplatform.cloud.activeviam.com/jenkins"), githubUser, githubToken);
+		jenkins.createJob(aksName+"pipeline", configFilePath);
+	}
+	
 	// Create cluster
 	public static Cluster createCompleteClusterInformations(Cluster cluster, String dbAdminUsername,
 			String keycloakUser, String dockerUserName, String dockerEmail) {
