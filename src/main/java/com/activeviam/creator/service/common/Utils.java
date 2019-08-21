@@ -105,10 +105,15 @@ public class Utils {
 		runCommand(createCertificate, taskid, logsPath);
 	}
 
-	public static void connectJenkins(String configFilePath,String githubUser, String githubToken,String aksName) throws URISyntaxException, IOException {
-		
-		JenkinsServer jenkins = new JenkinsServer(new URI("https://retailplatform.cloud.activeviam.com/jenkins"), githubUser, githubToken);
-		jenkins.createJob(aksName+"pipeline", configFilePath);
+	public static void connectJenkins(String configFilePath,String jenkinsUser, String jenkinsToken,String aksName, String jenkinsUrl) throws URISyntaxException, IOException {		
+		JenkinsServer jenkins = new JenkinsServer(new URI(jenkinsUrl), jenkinsUser, jenkinsToken);
+		Charset charset = StandardCharsets.UTF_8;
+ 		String content = new String(Files.readAllBytes(Paths.get(configFilePath)), charset);
+  		System.out.println(content);
+  		System.out.println("**** " +(jenkins.getJobXml("PipelineDeploy").toString()));
+ 	//	jenkins.createJob(aksName+"pipeline", content);
+// 		jenkins.createJob("pipeline", jenkins.getJobXml("PipelineDeploy").toString());
+
 	}
 	
 	// Create cluster

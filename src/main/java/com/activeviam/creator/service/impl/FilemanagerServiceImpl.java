@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Writer;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -56,7 +57,7 @@ public class FilemanagerServiceImpl {
 	private String ADMIN_UN ="admin_user_name";
 	private String ADMIN_PWD ="admin_pwd";
 	private String DB_NAME ="db_name";
-	
+	private String JENKINS_URL="https://retailplatform.cloud.activeviam.com/jenkins";
 	private String DB_USERNAME_SECRET="value_username_db";
 	private String DB_USERNAME_PASSWORD="value_password_db";
 	
@@ -182,6 +183,12 @@ public class FilemanagerServiceImpl {
 
 	@Value("${generated.config.xml.path}")
 	String generatedConfigFile;
+	
+	@Value("${github.username}")
+	String githubUserName;
+	
+	@Value("${github.token}")
+	String githubToken;
 	
 	Cluster cluster;
 	
@@ -407,7 +414,7 @@ public class FilemanagerServiceImpl {
 	}
 	
 	// start deploying
-	public void runDeploymentScripts(Cluster cluster,int taskid) throws IOException, InterruptedException {
+	public void runDeploymentScripts(Cluster cluster,int taskid) throws IOException, InterruptedException, URISyntaxException {
  		 connectUser(cluster,taskid);
 		 Utils.applyKubeFiles(generatedCreationSecretDBFilePath, taskid, logsPath);
 		 Utils.applyKubeFiles(generatedCreationKeycloakSecretFilePath,taskid, logsPath);
@@ -421,7 +428,7 @@ public class FilemanagerServiceImpl {
  		 Utils.createDomaineNameTlsCert(certFilePath, keyFilePath, taskid, logsPath);
  		 Utils.helmInstall( taskid, logsPath);
 		 Utils.deployKeycloakPod(generatedCreationKeycloak, keycloakCreationPvc, taskid, logsPath);
-	Utils.connectJenkins(configFilePath, githubUser, githubToken, aksName);
+	     Utils.connectJenkins(generatedConfigFile, githubUserName, githubToken, cluster.getAksName(),JENKINS_URL);
 	}
 	
 		
