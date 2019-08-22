@@ -109,10 +109,7 @@ public class Utils {
 		JenkinsServer jenkins = new JenkinsServer(new URI(jenkinsUrl), jenkinsUser, jenkinsToken);
 		Charset charset = StandardCharsets.UTF_8;
  		String content = new String(Files.readAllBytes(Paths.get(configFilePath)), charset);
-  		System.out.println(content);
-  		System.out.println("**** " +(jenkins.getJobXml("PipelineDeploy").toString()));
- 	//	jenkins.createJob(aksName+"pipeline", content);
-// 		jenkins.createJob("pipeline", jenkins.getJobXml("PipelineDeploy").toString());
+ 		jenkins.createJob(aksName+"pipeline", content);
 
 	}
 	

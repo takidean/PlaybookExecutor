@@ -184,11 +184,11 @@ public class FilemanagerServiceImpl {
 	@Value("${generated.config.xml.path}")
 	String generatedConfigFile;
 	
-	@Value("${github.username}")
-	String githubUserName;
+	@Value("${jenkinsUser.username}")
+	String jenkinsUserName;
 	
-	@Value("${github.token}")
-	String githubToken;
+	@Value("${jenkinsUser.token}")
+	String jenkinsUserToken;
 	
 	Cluster cluster;
 	
@@ -428,7 +428,7 @@ public class FilemanagerServiceImpl {
  		 Utils.createDomaineNameTlsCert(certFilePath, keyFilePath, taskid, logsPath);
  		 Utils.helmInstall( taskid, logsPath);
 		 Utils.deployKeycloakPod(generatedCreationKeycloak, keycloakCreationPvc, taskid, logsPath);
-	     Utils.connectJenkins(generatedConfigFile, githubUserName, githubToken, cluster.getAksName(),JENKINS_URL);
+	     Utils.connectJenkins(generatedConfigFile, jenkinsUserName, jenkinsUserToken, cluster.getAksName(),JENKINS_URL);
 	}
 	
 		
