@@ -44,14 +44,37 @@
 			<spring:bind path="vmSize">
 				<div class="form-group">
 					<form:select path="vmSize" class="form-control">
-						<form:option value="Standard_D2s_v3">Standard_D2s_v3</form:option>
-						<form:option value="Standard_DS2_v2">Standard_DS2_v2</form:option>
-						<form:option value="Standard_DS1_v2">Standard_DS1_v2</form:option>
-						<form:option selected="Standard_DS1_v2" value="Standard_DS1_v2">Standard_DS1_v2</form:option>
-						<form:option value="Standard_D16s_v3">16vCPU-64GiB D16s_v3</form:option>
-						<form:option value="Standard_B8ms">8vCPU-32GiB B8ms</form:option>
-						<form:option value="Standard_B4ms">4vCPU-16GiB B4ms</form:option>
-						<form:option value="Standard_B2ms">2vCPU-8GiB B2ms</form:option>
+						<form:option value="Standard_B2ms">Standard_B2ms</form:option>
+						<form:option value="Standard_B4ms">Standard_B4ms</form:option>
+						<form:option value="Standard_B8ms">Standard_B8ms</form:option>
+						<form:option value="Standard_B2ms">Standard_B16ms</form:option>
+						<form:option value="Standard_B2ms">Standard_B12ms</form:option>
+						<form:option value="Standard_B2ms">Standard_B20ms</form:option>
+						<form:option value="Standard_D16s_v3">Standard_D16s_v3</form:option>
+						<form:option value="Standard_D48s_v3">Standard_D48s_v3</form:option>
+						<form:option value="Standard_D64s_v3">Standard_D64s_v3</form:option>
+						<form:option value="Standard_D8as_v3">Standard_D8as_v3</form:option>
+						<form:option value="Standard_D16as_v3">Standard_D16as_v3</form:option>
+						<form:option value="Standard_D32as_v3">Standard_D32as_v3</form:option>
+						<form:option value="Standard_D48as_v3">Standard_D48as_v3</form:option>
+						<form:option value="Standard_D64as_v3">Standard_D64as_v3</form:option>
+						<form:option value="Standard_D8_v3">Standard_D8_v3</form:option>
+						<form:option value="Standard_D16_v3">Standard_D16_v3</form:option>
+						<form:option value="Standard_D32_v3">Standard_D32_v3</form:option>
+						<form:option value="Standard_D48_v3">Standard_D48_v3</form:option>
+						<form:option value="Standard_D64_v3">Standard_D64_v3</form:option>
+						<form:option value="Standard_D8a_v3">Standard_D8a_v3</form:option>
+						<form:option value="Standard_D16a_v3">Standard_D16a_v3</form:option>
+						<form:option value="Standard_D32a_v3">Standard_D32a_v3</form:option>
+						<form:option value="Standard_D48a_v3">Standard_D48a_v3</form:option>
+						<form:option value="Standard_D64a_v3">Standard_D64a_v3</form:option>
+						<form:option value="Standard_DS4_v2">Standard_DS4_v2</form:option>
+						<form:option value="Standard_DS5_v2">Standard_DS5_v2</form:option>
+						<form:option value="Standard_D3_v2">Standard_D3_v2</form:option>
+						<form:option value="Standard_D4_v2">Standard_D4_v2</form:option>
+						<form:option value="Standard_D5_v2">Standard_D5_v2</form:option>
+						<form:option value="Standard_A4m_v2">Standard_A4m_v2</form:option>
+						<form:option value="Standard_A8m_v2">Standard_A8m_v2</form:option>
 					</form:select>
 				</div>
 			</spring:bind>
@@ -62,14 +85,6 @@
                                 autofocus="true"></form:input>
                 </div>
             </spring:bind>
-
-   <!--          <spring:bind path="keycloakUser">
-                <div class="form-group ${status.error ? 'has-error' : ''}">
-                    <form:input type="text" path="keycloakUser" class="form-control" placeholder="keycloakUser"
-                                autofocus="true"></form:input>
-                </div>
-            </spring:bind>
- -->
 
 			<spring:bind path="keycloakPassword">
 				<div class="form-group ${status.error ? 'has-error' : ''}">
@@ -92,12 +107,21 @@
                 </div>
             </spring:bind>
 
+			<spring:bind path="location">
+                <div class="form-group ${status.error ? 'has-error' : ''}">
+                    <form:input type="text" path="location" class="form-control" placeholder="location"
+                                autofocus="true"></form:input>
+                </div>
+            </spring:bind>
+
+
             <spring:bind path="githubRepository">
                 <div class="form-group ${status.error ? 'has-error' : ''}">
                     <form:input type="text" path="githubRepository" class="form-control" placeholder="githubRepository"
                                 autofocus="true"></form:input>
                 </div>
             </spring:bind>
+            
             <spring:bind path="githubBranch">
                 <div class="form-group ${status.error ? 'has-error' : ''}">
                     <form:input type="text" path="githubBranch" class="form-control" placeholder="githubBranch"

@@ -20,6 +20,7 @@ public class Cluster {
 	private String standardAksName;
 	private String githubRepository;
 	private String githubBranch;
+	private String location;
 	//
 	
 	public String getAksName() {
@@ -142,6 +143,14 @@ public class Cluster {
 	}
 	public void setGithubBranch(String githubBranch) {
 		this.githubBranch = githubBranch;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
 	}
 
 }

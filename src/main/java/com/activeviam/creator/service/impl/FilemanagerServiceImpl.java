@@ -60,7 +60,7 @@ public class FilemanagerServiceImpl {
 	private String JENKINS_URL="https://retailplatform.cloud.activeviam.com/jenkins";
 	private String DB_USERNAME_SECRET="value_username_db";
 	private String DB_USERNAME_PASSWORD="value_password_db";
-	
+	private String LOCATION="location_value";
 	private String KEYCLOAK_USERNAME_SECRET="value_username_keycloak";
 	private String KEYCLOAK_USERNAME_PASSWORD="value_password_keycloak";
 	private String DOMAIN_VALUE_NAME="domain_name_value";
@@ -217,6 +217,8 @@ public class FilemanagerServiceImpl {
 		content = content.replaceAll(COUNT_VALUE, cluster.getVmCount());
 		content = content.replaceAll(VM_SIZE_VALUE, cluster.getVmSize());
 		content = content.replaceAll(ENV_VALUE, cluster.getTag());
+System.out.println(cluster.getLocation());
+		content = content.replaceAll(LOCATION, cluster.getLocation());
 		Files.write(path, content.getBytes(charset));
 		return content;
 
@@ -230,6 +232,8 @@ public class FilemanagerServiceImpl {
 		content = content.replaceAll(CLIENT_ID_VALUE, clientId);
 		content = content.replaceAll(CLIENT_SECRET_VALUE, clientSecret);		
 		content = content.replaceAll(RESOURCE_GROUP_VALUE, cluster.getAksName());
+		content = content.replaceAll(LOCATION, cluster.getLocation());
+
 		Files.write(path, content.getBytes(charset));
 		return content;
 	}
@@ -243,6 +247,8 @@ public class FilemanagerServiceImpl {
 		content = content.replaceAll(DB_SERVER_NAME, cluster.getDbServerName());
 		content = content.replaceAll(ADMIN_UN, cluster.getDbAdminUsername());
 		content = content.replaceAll(ADMIN_PWD, cluster.getDbAdminPassword());
+		content = content.replaceAll(LOCATION, cluster.getLocation());
+
 		Files.write(path, content.getBytes(charset));
 		return content;
 
@@ -255,6 +261,8 @@ public class FilemanagerServiceImpl {
 		content = content.replaceAll(RESOURCE_GROUP_VALUE, cluster.getAksName());
 		content = content.replaceAll(DB_SERVER_NAME, cluster.getDbServerName());	
 		content = content.replaceAll(DB_NAME, cluster.getDbName());		
+		content = content.replaceAll(LOCATION, cluster.getLocation());
+
 		Files.write(path, content.getBytes(charset));
 		return content;
 	}
@@ -271,6 +279,8 @@ public class FilemanagerServiceImpl {
 		content = content.replaceAll(CLIENT_ID_VALUE, clientId);
 		content = content.replaceAll(CLIENT_SECRET_VALUE, clientSecret);
 		content = content.replaceAll(ENV_VALUE, cluster.getTag());
+		content = content.replaceAll(LOCATION, cluster.getLocation());
+
 		Files.write(path, content.getBytes(charset));
 		return content;
 	}

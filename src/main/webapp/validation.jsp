@@ -60,6 +60,10 @@
                 <p  class="form-control" >domain name: ${cluster.domainName}</p>
                 </div>
 
+                <div class="form-group ${status.error ? 'has-error' : ''}">
+                <p  class="form-control" >location: ${cluster.location}</p>
+                </div>
+
 
                 <div class="form-group ${status.error ? 'has-error' : ''}">
 				<p  class="form-control" >Tag: ${cluster.tag}</p>                </div>

@@ -133,7 +133,7 @@ public class Utils {
 		clusterComplete.setKeycloakUser(keycloakUser);
 		clusterComplete.setDockerUserName(dockerUserName);
 		clusterComplete.setDockerEmail(dockerEmail);
-
+		clusterComplete.setLocation(cluster.getLocation());
 		return clusterComplete;
 	}
 

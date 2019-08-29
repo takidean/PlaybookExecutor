@@ -3,7 +3,7 @@
   connection: local
   vars:
     resource_group: resource_group_value
-    location: westeurope
+    location: location_value
     aks_name: aks_name_value
     username: azureuser
     ssh_key: ssh-rsa_value
@@ -27,7 +27,7 @@
       agent_pool_profiles:
         - name: default
           count: 1
-          vm_size: Standard_DS1_v2
+          vm_size: Standard_DS2_v2
       tags:
         Environment: env_value
 

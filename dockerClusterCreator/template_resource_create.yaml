@@ -3,7 +3,7 @@
   connection: local
   vars:
     resource_group: resource_group_value
-    location: westeurope
+    location: location_value
     username: azureuser
     ssh_key: ssh-rsa_value
     client_id: client_id_value

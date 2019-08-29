@@ -6,6 +6,6 @@
     azure_rm_sqlserver:
      resource_group: resource_group_value
      name: db_server_name
-     location: westeurope
+     location: location_value
      admin_username: admin_user_name
      admin_password: admin_pwd
