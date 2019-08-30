@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-slave-second
+spec:
+  selector:
+    matchLabels:
+      app: jenkins-slave-second
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: jenkins-slave-second
+    spec:
+      securityContext:
+        fsGroup: 10000 
+        runAsUser: 0
+      containers:
+       - name: jenkins-slave-second
+         image: activeviam-delivery-docker-internal.jfrog.io/jenkins-slave:v2
+
+         ports:
+          - containerPort: 22
+         volumeMounts:
+          - name: pv-jenkins-slave 
+            mountPath: /home/jenkins/.m2
+      imagePullSecrets:
+        - name: activeviam.jfrog.io
+      volumes:
+       - name: pv-jenkins-slave 
+         persistentVolumeClaim:
+          claimName: claim-jenkins-slave 

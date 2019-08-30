@@ -1,0 +1,68 @@
+FROM maven:3.6.0-jdk-8-alpine
+#FROM jenkinsci/jnlp-slave:alpine
+
+#USER root
+
+
+
+RUN apk add --no-cache git
+RUN apk add --no-cache bash
+RUN apk add --update nodejs-npm
+RUN apk add yarn
+RUN apk add --update curl
+# Add user jenkins to the image
+RUN adduser -D jenkins
+# Set password for the jenkins user (you may want to alter this).
+RUN echo "jenkins:jenkins" | chpasswd
+
+RUN chown jenkins /usr/share/maven
+ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
+
+ENV MAVEN_HOME /usr/share/maven
+
+
+ARG JENKINS_REMOTING_VERSION=3.27
+
+# See https://github.com/jenkinsci/docker-slave/blob/master/Dockerfile#L31
+RUN curl --create-dirs -sSLo /usr/share/jenkins/slave.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/$JENKINS_REMOTING_VERSION/remoting-$JENKINS_REMOTING_VERSION.jar \
+  && chmod 755 /usr/share/jenkins \
+ && chmod 644 /usr/share/jenkins/slave.jar
+
+COPY jenkins-slave /usr/local/bin/jenkins-slave
+
+RUN chmod a+rwx /home/jenkins
+
+RUN mkdir /home/jenkins/.m2
+RUN chown -R jenkins:jenkins /home/jenkins/.m2/
+
+
+RUN mkdir /var/jenkins_home
+COPY maven_build.sh /var/jenkins_home/
+COPY maven_build_pricing.sh /var/jenkins_home/
+RUN chown jenkins /usr/lib/node_modules
+RUN chown jenkins /usr/lib/node_modules/npm 
+RUN chown jenkins /var/jenkins_home/maven_build.sh
+RUN chown jenkins /var/jenkins_home/maven_build_pricing.sh 
+RUN chown jenkins /home/jenkins/ -R 
+RUN chmod +xw /var/jenkins_home/maven*
+RUN chown jenkins /root/
+
+COPY settings.xml /home/jenkins/.m2/settings.xml
+
+RUN chown jenkins:jenkins /home/jenkins/.m2/settings.xml
+COPY jenkins-slave /usr/local/bin/jenkins-slave
+COPY slave.jar /usr/share/jenkins/slave.jar
+
+ENTRYPOINT ["jenkins-slave"]
+#USER jenkins
+#ENV MAVEN_HOME /usr/share/maven
+#ENV PATH $PATH:$MAVEN_HOME/bin
+
+#RUN apk add --no-cache openssh
+#RUN mkdir -p /var/run/sshd
+#RUN ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N '' -t rsa
+#RUN ssh-keygen -f /etc/ssh/ssh_host_dsa_key -N '' -t dsa
+
+
+#EXPOSE 22
+#CMD ["/usr/sbin/sshd","-D"]

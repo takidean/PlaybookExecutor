@@ -1,0 +1,21 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: jenkins
+spec:
+  selector:
+    app: jenkins
+ 
+#  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+    name: master
+  - protocol: TCP
+    port: 50000
+    targetPort: 50000
+    name: slaves
+#  externalIPs:
+#  - 52.178.104.243
+#  type: LoadBalancer

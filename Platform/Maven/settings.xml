@@ -1,0 +1,83 @@
+<settings>
+        <localRepository>${user.home}/.m2/repository</localRepository>
+        <profiles>
+                <profile>
+      <id>jdk-1.8</id>
+ 
+      <activation>
+        <jdk>1.8</jdk>
+      </activation>
+
+                        <repositories>
+                                <repository>
+                                        <id>JCenter</id>
+                                        <name>JCenter Repository</name>
+                                        <url>http://jcenter.bintray.com/</url>
+                                        <snapshots>
+                                                <enabled>false</enabled>
+                                        </snapshots>
+                                        <layout>default</layout>
+                                </repository>
+ 
+                                <repository>
+                                        <id>ActiveDeliveryInternalRepository</id>
+                                        <name>Active Delivery Internal Repository</name>
+                                        <url>https://activeviam.jfrog.io/activeviam/mvn-internal/</url>
+                                        <layout>default</layout>
+                                        <snapshots>
+                                                <enabled>false</enabled>
+                                        </snapshots>
+                                </repository>
+                        </repositories>
+                </profile>
+ 
+                <profile>
+                        <id>release_profile</id>
+                        <activation>
+                                <activeByDefault>true</activeByDefault>
+                        </activation>
+                        <repositories>
+                                <repository>
+                                        <id>ActiveDeliveryReleaseRepository</id>
+                                        <name>Active Internal Repository</name>
+                                        <url>https://activeviam.jfrog.io/activeviam/delivery-mvn-release/</url>
+                                        <layout>default</layout>
+                                        <snapshots>
+                                                <enabled>false</enabled>
+                                        </snapshots>
+                                </repository>
+                        </repositories>
+ 
+                        <properties>
+                                <quartetfs.repository.id>ActiveDeliveryReleaseRepository</quartetfs.repository.id>
+                                <quartetfs.repository.url>https://activeviam.jfrog.io/activeviam/delivery-mvn-release/</quartetfs.repository.url>
+                        </properties>
+                </profile>
+ 
+                <profile>
+                        <id>downloadSources</id>
+                        <activation>
+                                <activeByDefault>true</activeByDefault>
+                        </activation>
+                        <properties>
+                                <downloadSources>true</downloadSources>
+                                <downloadJavadocs>true</downloadJavadocs>
+                        </properties>
+                </profile>
+        </profiles>
+     
+        <!-- the section below is used for deployment -->
+        <servers>
+                <server>
+                        <id>ActiveDeliveryInternalRepository</id>
+                        <username></username>
+                        <password></password>
+                </server>
+                <server>
+                        <id>ActiveDeliveryReleaseRepository</id>
+                        <username></username>
+                        <password></password>
+                </server>
+        </servers>
+		
+</settings>

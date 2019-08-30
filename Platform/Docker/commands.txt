@@ -1,0 +1,4 @@
+docker rm $(docker ps -a -q)
+docker build -t .
+docker tag complete activeviam-delivery-docker-internal.jfrog.io/jenkins-slave-liv:v2.1
+docker push activeviam-delivery-docker-internal.jfrog.io/jenkins-slave-liv:v2.1

@@ -1,0 +1,14 @@
+<connection-url>jdbc:sqlserver://keyckloak-server.database.windows.net:1433;database=keyckloak;user=admintest@keyckloak-server;password=peCZCMrksExaH6a4</connection-url>
+<driver>sqlserver</driver>
+<security>
+<user-name>admintest</user-name>
+<password>peCZCMrksExaH6a4</password>
+</security>
+</datasource>
+
+
+docker run -p 8080:8080 jboss/keycloak
+
+* create image configured of keycloak 
+connect to db SQL 
+jdbc:sqlserver://keyckloak-server.database.windows.net:1433;database=keycloak

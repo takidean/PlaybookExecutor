@@ -1,0 +1,9 @@
+FROM jboss/keycloak:latest
+
+MAINTAINER Stock Software
+
+
+RUN mkdir -p /opt/jboss/keycloak/modules/system/layers/base/net/sourceforge/jtds/main; cd /opt/jboss/keycloak/modules/system/layers/base/net/sourceforge/jtds/main; curl -O http://central.maven.org/maven2/net/sourceforge/jtds/jtds/1.3.1/jtds-1.3.1.jar
+ADD module.xml /opt/jboss/keycloak/modules/system/layers/base/net/sourceforge/jtds/main/
+ADD standalone.xml /opt/jboss/keycloak/standalone/configuration/
+

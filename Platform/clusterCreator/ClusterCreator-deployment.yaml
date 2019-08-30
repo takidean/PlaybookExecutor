@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clustercreator
+spec:
+  selector:
+    matchLabels:
+      app: clustercreator
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: clustercreator
+    spec:
+      securityContext:
+        runAsUser: 0
+      containers:
+       - name: clustercreator
+         image: activeviam-delivery-docker-internal.jfrog.io/ansible-azure-creator:v1.6
+         ports:
+          - containerPort: 8080
+                  
+      imagePullSecrets:
+        - name: activeviam.jfrog.io
+#---
+#kind: Service
+#apiVersion: v1
+#metadata:
+#  name: clustercreator-service
+#spec:
+#  selector:
+#    app: clustercreator
+#  ports:
+#  - protocol: TCP
+#    port: 80
+#    targetPort: 8080

@@ -1,0 +1,16 @@
+{
+  "kind": "Secret",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "activeviam.jfrog.io",
+    "namespace": "default",
+    "selfLink": "/api/v1/namespaces/default/secrets/activeviam.jfrog.io",
+    "uid": "9dd59160-5179-11e9-bf8a-fac802ee746f",
+    "resourceVersion": "29291",
+    "creationTimestamp": "2019-03-28T16:50:39Z"
+  },
+  "data": {
+    ".dockerconfigjson": "eyJhdXRocyI6eyJodHRwczovL2FjdGl2ZXZpYW0tZGVsaXZlcnktZG9ja2VyLWludGVybmFsLmpmcm9nLmlvL3YyLyI6eyJ1c2VybmFtZSI6ImRlbGl2ZXJ5LWplbmtpbnMiLCJwYXNzd29yZCI6IlhrYTYySThtMVpYZyIsImVtYWlsIjoidHNkLmV4dEBhY3RpdmV2aWFtLmNvbSIsImF1dGgiOiJaR1ZzYVhabGNua3RhbVZ1YTJsdWN6cFlhMkUyTWtrNGJURmFXR2M9In19fQ=="
+  },
+  "type": "kubernetes.io/dockerconfigjson"
+}

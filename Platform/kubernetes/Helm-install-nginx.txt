@@ -1,0 +1,13 @@
+#### INSTALL NGINX #####
+***** COMMANDS FOR RBAC CLUSTER *****
+
+kubectl  create serviceaccount tiller
+
+kubectl create clusterrolebinding tiller-cluster-rule  --clusterrole=cluster-admin --serviceaccount=default:tiller
+
+kubectl  patch deploy tiller-deploy  -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}' 
+
+**** COMMANDS FOR ANY CLUSTER ******
+helm list
+helm repo update
+helm install --name nginx-ingress stable/nginx-ingress

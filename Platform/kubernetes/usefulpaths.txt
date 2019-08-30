@@ -1,0 +1,2 @@
+https://medium.com/@mcvidanagama/add-tls-cert-to-bare-metal-kubernetes-ingress-747d9e04a78d
+https://docs.bitnami.com/kubernetes/how-to/secure-kubernetes-services-with-ingress-tls-letsencrypt/

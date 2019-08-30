@@ -1,0 +1,2 @@
+kubectl create secret  docker-registry activeviam.jfrog.io   --docker-server=https://activeviam.jfrog.io/activeviam --docker-username= --docker-password= --docker-email=
+kubectl create secret tls active-tls-cert --key cloud.activeviam.com.key --cert cloud.activeviam.com_ssl_certificate.crt

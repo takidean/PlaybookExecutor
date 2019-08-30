@@ -1,0 +1,43 @@
+pipeline {
+	environment {
+		registryCredential = 'd8801e96-152e-4998-8205-ae2e8ea9e70e'
+	}
+
+    agent any
+    stages {
+        stage ('Build Project clientname') {
+            steps{
+                sh  'mvn clean install'
+            }
+        }
+ 
+         stage ('push docker image')
+		{
+            steps
+			{
+               withDockerRegistry([ credentialsId: "6544de7e-17a4-4576-9b9b-e86bc1e4f903", url: "activeviam-delivery-docker-internal.jfrog.io" ]) 
+			   {
+                 sh 'docker push activeviam-delivery-docker-internal.jfrog.io/repository_activeui_name'
+                 sh 'docker push activeviam-delivery-docker-internal.jfrog.io/registry_activepricing'
+				 sh 'docker push activeviam-delivery-docker-internal.jfrog.io/registry_content_server'
+                }
+            }
+		}
+ 
+ 				// deploy  helm 
+         stage ('deploy image')
+		{
+            steps
+			{
+               withCredentials([string(credentialsId: 'my-pass',usernameVariable: 'USERNAME', passwordVariable: 'PASS1' )])
+			   {
+                 sh 'az login --service-principal --username $USERNAME --password $PASS1 --tenant'
+                 sh 'az aks get-credentials --resource-group resource_group_value --name aks_name  --subscription subscription_id'
+				 sh 'helm repo add <REPO_KEY> https://activeviam.jfrog.io/activeviam/<REPO_KEY> <USERNAME> <PASSWORD>'
+				 sh 'helm repo update'
+				 sh 'helm install <REPO_KEY>/<CHART_NAME>'
+                }
+            }
+		}
+        }
+}

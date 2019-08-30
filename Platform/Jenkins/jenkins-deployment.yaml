@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins
+spec:
+  selector:
+    matchLabels:
+      app: jenkins
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      securityContext:
+        fsGroup: 1000 
+        runAsUser: 0
+      containers:
+       - name: jenkins
+         image: activeviam-delivery-docker-internal.jfrog.io/jenkins-master:latest
+#         image: jenkins/jenkins:lts
+         resources:
+            limits:
+               memory: "2000Mi"
+            requests:
+               memory: "2000Mi"
+         env:
+          - name: JENKINS_OPTS
+            value: --prefix=/jenkins
+         ports:
+          - containerPort: 8080
+          - containerPort: 8443
+          - containerPort: 50000
+         volumeMounts:
+          - name: jenkins-storage
+            mountPath: /var/jenkins_home
+      imagePullSecrets:
+        - name: activeviam.jfrog.io
+      volumes:
+       - name: jenkins-storage
+         persistentVolumeClaim:
+          claimName: jenkins-home
+#---
+#kind: Service
+#apiVersion: v1
+#metadata:
+#  name: jenkins
+#spec:
+#  selector:
+#    app: jenkins
+
+#  type: NodePort
+#  ports:
+#  - protocol: TCP
+#    port: 80
+#    targetPort: 8080
+#    name: master
+#  - protocol: TCP
+#    port: 50000
+#    targetPort: 50000
+#    name: slaves
+#  externalIPs:
+#  - 52.178.104.243
+#  type: LoadBalancer

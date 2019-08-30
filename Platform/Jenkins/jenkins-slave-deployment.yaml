@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-slave
+spec:
+  selector:
+    matchLabels:
+      app: jenkins-slave
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: jenkins-slave
+    spec:
+      securityContext:
+        fsGroup: 10000 
+        runAsUser: 0
+      containers:
+       - name: jenkins-slave
+         image: activeviam-delivery-docker-internal.jfrog.io/jenkins-slave:v2
+
+         ports:
+          - containerPort: 22
+      nodeSelector:
+         nodename: un
+                  
+      imagePullSecrets:
+        - name: activeviam.jfrog.io
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: jenkins-slave-service
+spec:
+  selector:
+    app: jenkins-slave
+  ports:
+  - protocol: TCP
+    port: 18181
+    targetPort: 22
+  type: LoadBalancer

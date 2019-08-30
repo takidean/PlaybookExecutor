@@ -1,0 +1,2 @@
+docker tag ansible-azure activeviam-delivery-docker-internal.jfrog.io/ansible-azure-creator:v1.3
+docker push  activeviam-delivery-docker-internal.jfrog.io/ansible-azure-creator:v1.3

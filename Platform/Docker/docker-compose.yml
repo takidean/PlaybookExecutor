@@ -1,0 +1,24 @@
+version: "3.6"
+
+services:
+  jenkins:
+    image: takidean/jenkins-act:first
+    volumes:
+      - ./jenkins_home:/var/jenkins_home
+    ports:
+      - '80:8080'
+      - '443:8443'
+      - '50000:50000'
+      
+
+# mettre les images docker sur notre artifactory
+# créer un repo retail platform
+# limiter les snapshots sur artifactory pour une semaine à voir avec alex
+# build sur chaque pull request même sur develop + à 20h
+# webhook en master
+# checkstyle sur portail + findbug  (+++ )// sonar ( à voir pour javascript ) (base)
+#/var/jenkins_home/maven_build.sh à rajouter dans github
+# Ajouter dans github les régles de dev ... config 
+# report de test cumcumber jenkins lance 
+# régles settings.xml à écrire 
+# le master tjrs up / quand il lance des jobs il execute des images slaves pour tourner (+slaves qui font tourner 4 jobs en paralléle ) (master / develop/ release )
